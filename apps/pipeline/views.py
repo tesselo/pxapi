@@ -1,7 +1,3 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_guardian import filters
-
 from pipeline.models import KerasModel, PixelsData, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
 from pipeline.serializers import (
@@ -9,6 +5,9 @@ from pipeline.serializers import (
     PixelsDataSerializer,
     TrainingDataSerializer,
 )
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_guardian import filters
 
 
 class TesseloApiViewSet(viewsets.ModelViewSet):

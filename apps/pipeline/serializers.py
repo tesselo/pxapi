@@ -1,7 +1,6 @@
+from pipeline.models import KerasModel, PixelsData, TrainingData
 from rest_framework import serializers
 from rest_framework_guardian.serializers import ObjectPermissionsAssignmentMixin
-
-from pipeline.models import KerasModel, PixelsData, TrainingData
 
 
 class TesseloBaseSerializer(

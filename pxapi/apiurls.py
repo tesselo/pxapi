@@ -1,7 +1,6 @@
 from django.conf.urls import include, url
-from rest_framework import routers
-
 from pipeline.views import KerasModelViewSet, PixelsDataViewSet, TrainingDataViewSet
+from rest_framework import routers
 
 router = routers.DefaultRouter()
 
