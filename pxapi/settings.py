@@ -140,3 +140,12 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
+
+if DEBUG:
+    STATIC_URL = "/static/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "local_media")
+else:
+    DEFAULT_FILE_STORAGE = "pxapi.storages.MediaStorage"
+    STATICFILES_STORAGE = "pxapi.storages.StaticStorage"
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID_ZAP")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY_ZAP")

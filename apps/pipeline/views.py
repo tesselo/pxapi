@@ -11,10 +11,11 @@ from rest_framework_guardian import filters
 
 
 class TesseloApiViewSet(viewsets.ModelViewSet):
-    # permission_classes = [TesseloBaseObjectPermissions]
-    permission_classes = (IsAuthenticated, TesseloBaseObjectPermissions)
-
-    filter_backends = [filters.ObjectPermissionsFilter]
+    permission_classes = (
+        IsAuthenticated,
+        TesseloBaseObjectPermissions,
+    )
+    filter_backends = (filters.ObjectPermissionsFilter,)
 
 
 class TrainingDataViewSet(TesseloApiViewSet):
