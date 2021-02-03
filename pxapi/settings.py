@@ -32,16 +32,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django apps.
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd party apps.
     "rest_framework",
     "guardian",
-    "tsuser",
+    # Own apps.
+    "batch",
     "pipeline",
+    "tsuser",
 ]
 
 AUTHENTICATION_BACKENDS = [
