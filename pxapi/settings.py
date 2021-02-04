@@ -26,7 +26,7 @@ SECRET_KEY = "8-2x@(1mnf+pz^xy(xt8vfho19l!938o5lei_0l&2sw7=vw)^z"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*.tesselo.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
