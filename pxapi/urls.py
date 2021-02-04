@@ -23,19 +23,27 @@ from pxapi.apiurls import apiurlpatterns
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
-    path('openapi', get_schema_view(
-        title="Your Project",
-        description="API for all things …",
-        version="1.0.0"
-    ), name='openapi-schema'),
-    path('redoc/', TemplateView.as_view(
-        template_name='redoc.html',
-        extra_context={'schema_url':'openapi-schema'}
-    ), name='redoc'),
-    path('swagger-ui/', TemplateView.as_view(
-        template_name='swagger.html',
-        extra_context={'schema_url':'openapi-schema'}
-    ), name='swagger-ui'),
+    path(
+        "openapi",
+        get_schema_view(
+            title="Pixels API", description="A pixel grabber engine.", version="1.0.0"
+        ),
+        name="openapi-schema",
+    ),
+    path(
+        "redoc/",
+        TemplateView.as_view(
+            template_name="redoc.html", extra_context={"schema_url": "openapi-schema"}
+        ),
+        name="redoc",
+    ),
+    path(
+        "swagger-ui/",
+        TemplateView.as_view(
+            template_name="swagger.html", extra_context={"schema_url": "openapi-schema"}
+        ),
+        name="swagger-ui",
+    ),
 ]
 
 urlpatterns += apiurlpatterns

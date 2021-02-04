@@ -68,7 +68,7 @@ ROOT_URLCONF = "pxapi.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'pxapi/templates')],
+        "DIRS": [os.path.join(BASE_DIR, "pxapi/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

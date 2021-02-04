@@ -22,6 +22,7 @@ class TrainingDataViewSet(TesseloApiViewSet):
     """
     My Awesome title.
     """
+
     queryset = TrainingData.objects.all()
     serializer_class = TrainingDataSerializer
 
