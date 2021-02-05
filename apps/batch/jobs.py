@@ -13,7 +13,7 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False):
         "jobQueue": "fetch-and-run-queue",
         "jobDefinition": "first-run-job-definition",
         "containerOverrides": {
-            "command": ['runpixels.py', funk, *args],
+            "command": ["runpixels.py", funk, *args],
         },
     }
 
