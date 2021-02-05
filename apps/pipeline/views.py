@@ -23,15 +23,15 @@ class TrainingDataViewSet(TesseloApiViewSet):
     My Awesome title.
     """
 
-    queryset = TrainingData.objects.all().order_by('pk')
+    queryset = TrainingData.objects.all().order_by("pk")
     serializer_class = TrainingDataSerializer
 
 
 class PixelsDataViewSet(TesseloApiViewSet):
-    queryset = PixelsData.objects.all().order_by('pk')
+    queryset = PixelsData.objects.all().order_by("pk")
     serializer_class = PixelsDataSerializer
 
 
 class KerasModelViewSet(TesseloApiViewSet):
-    queryset = KerasModel.objects.all().order_by('pk')
+    queryset = KerasModel.objects.all().order_by("pk")
     serializer_class = KerasModelSerializer
