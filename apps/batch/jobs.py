@@ -9,7 +9,10 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False):
     """
     # Create job dict, inserting job name and command to execute.
     job = {
-        "jobName": "{}-{}".format(funk, datetime.datetime.now()),
+        "jobName": "{}-{}".format(
+            funk.replace(".", "-"),
+            datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+        ),
         "jobQueue": "fetch-and-run-queue",
         "jobDefinition": "first-run-job-definition",
         "containerOverrides": {
