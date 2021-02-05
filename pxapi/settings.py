@@ -17,20 +17,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "8-2x@(1mnf+pz^xy(xt8vfho19l!938o5lei_0l&2sw7=vw)^z"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
 INSTALLED_APPS = [
     # Django apps.
     "django.contrib.admin",
@@ -42,6 +37,7 @@ INSTALLED_APPS = [
     # 3rd party apps.
     "rest_framework",
     "guardian",
+    "django_s3_storage",
     # Own apps.
     "batch",
     "pipeline",
@@ -83,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "pxapi.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if DEBUG:
@@ -95,19 +90,18 @@ if DEBUG:
     }
 else:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'tesselo'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PORT': os.environ.get('DB_PORT', 5432),
-        'PASSWORD': os.environ.get('DB_PASSWORD', None),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "tesselo"),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "USER": os.environ.get("DB_USER", "postgres"),
+            "PORT": os.environ.get("DB_PORT", 5432),
+            "PASSWORD": os.environ.get("DB_PASSWORD", None),
+        }
     }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -138,7 +132,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Rest framework settings.
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -153,12 +146,22 @@ REST_FRAMEWORK = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 if DEBUG:
-    STATIC_ROOT = '/tmp/staticfiles'
+    STATIC_ROOT = "/tmp/staticfiles"
     STATIC_URL = "/static/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "local_media")
 else:
-    DEFAULT_FILE_STORAGE = "pxapi.storages.MediaStorage"
-    STATICFILES_STORAGE = "pxapi.storages.StaticStorage"
+    STATIC_URL = "https://{}.s3.amazonaws.com/".format(
+        os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
+    )
+    # AWS_S3_REGION_NAME = 'eu-central-1'
+    AWS_REGION = "eu-central-1"
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID_ZAP")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY_ZAP")
-    AWS_S3_REGION_NAME = 'eu-central-1' 
+    # Media files.
+    AWS_S3_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
+    DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_S3_FILE_OVERWRITE = True
+    # Static files.
+    AWS_S3_BUCKET_NAME_STATIC = os.environ.get("AWS_STORAGE_BUCKET_NAME_STATIC")
+    STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"

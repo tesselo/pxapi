@@ -3,8 +3,8 @@ djangorestframework==3.12.2
 django-filter==2.4.0
 Markdown==3.3.3
 djangorestframework-guardian==0.3.0
-django-storages==1.11.1
 boto3==1.17.1
 PyYAML==5.4.1
 uritemplate==3.0.1
 psycopg2-binary==2.8.6
+django-s3-storage==0.13.4
