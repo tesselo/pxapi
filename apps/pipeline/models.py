@@ -1,7 +1,8 @@
+import os
 import uuid
 
-from batch.models import BatchJob
 from batch import jobs
+from batch.models import BatchJob
 from django.db import models
 
 
@@ -18,7 +19,7 @@ class NamedModel(models.Model):
 
 
 def training_data_zip_upload_to(instance, filename):
-    return f"pixelsdata/{instance.pk}/data.zip"
+    return f"trainingdata/{instance.pk}/{filename}"
 
 
 class TrainingData(NamedModel):
@@ -32,8 +33,9 @@ class TrainingData(NamedModel):
         # Construct S3 uri for the zipfile.
         bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA", None)
         if bucket:
-            uri = 'S3://{}/{}'.format(bucket, self.zipfile.name)
-            jobs.push('pixels.stac.parse_training_data', uri)
+            uri = "S3://{}/{}".format(bucket, self.zipfile.name)
+            jobs.push("pixels.stac.parse_training_data", uri)
+
 
 def pixels_data_json_upload_to(instance, filename):
     return f"pixelsdata/{instance.pk}/config.json"
