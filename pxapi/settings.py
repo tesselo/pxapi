@@ -161,3 +161,4 @@ else:
     STATICFILES_STORAGE = "pxapi.storages.StaticStorage"
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID_ZAP")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY_ZAP")
+    AWS_S3_REGION_NAME = 'eu-central-1' 
