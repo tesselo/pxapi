@@ -155,8 +155,6 @@ else:
     )
     # AWS_S3_REGION_NAME = 'eu-central-1'
     AWS_REGION = "eu-central-1"
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     # Media files.
     AWS_S3_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
     DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
