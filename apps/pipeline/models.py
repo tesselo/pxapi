@@ -9,8 +9,10 @@ from django.db import models
 
 class NamedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250, default="")
-    description = models.TextField(default="")
+    name = models.CharField(max_length=250, help_text="Short name of the object.")
+    description = models.TextField(
+        default="", blank=True, help_text="Detailed description of the object."
+    )
 
     class Meta:
         abstract = True
@@ -24,7 +26,10 @@ def training_data_zip_upload_to(instance, filename):
 
 
 class TrainingData(NamedModel):
-    zipfile = models.FileField(upload_to=training_data_zip_upload_to)
+    zipfile = models.FileField(
+        upload_to=training_data_zip_upload_to,
+        help_text="A zip file containing the training data.",
+    )
     batchjob_parse = models.ForeignKey(
         BatchJob, blank=True, null=True, editable=False, on_delete=models.PROTECT
     )
@@ -43,8 +48,9 @@ class TrainingData(NamedModel):
             uri = "s3://{}/{}".format(bucket, self.zipfile.name)
             # Push job.
             job = jobs.push("pixels.stac.parse_training_data", uri)
-            # Register job id.
+            # Register job id and submitted state.
             self.batchjob_parse.job_id = job[BATCH_JOB_ID_KEY]
+            self.batchjob_parse.status = BatchJob.SUBMITTED
             self.batchjob_parse.save()
 
 

@@ -24,6 +24,8 @@ class TrainingDataSerializer(TesseloBaseSerializer):
     class Meta:
         model = TrainingData
         fields = "__all__"
+        read_only_fields = ["batchjob_parse"]
+        depth = 1
 
 
 class PixelsDataSerializer(TesseloBaseSerializer):
