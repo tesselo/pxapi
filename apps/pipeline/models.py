@@ -31,7 +31,8 @@ class TrainingData(NamedModel):
 
     def save(self, *args, **kwargs):
         # Pre-create batch job.
-        self.batchjob_parse = BatchJob.objects.create()
+        if not self.batchjob_parse:
+            self.batchjob_parse = BatchJob.objects.create()
         # Save object data.
         super().save(*args, **kwargs)
         # Construct S3 uri for the zipfile.
