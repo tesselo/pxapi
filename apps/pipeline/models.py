@@ -2,6 +2,7 @@ import os
 import uuid
 
 from batch import jobs
+from batch.const import BATCH_JOB_ID_KEY
 from batch.models import BatchJob
 from django.db import models
 
@@ -24,17 +25,26 @@ def training_data_zip_upload_to(instance, filename):
 
 class TrainingData(NamedModel):
     zipfile = models.FileField(upload_to=training_data_zip_upload_to)
-    batchjob = models.ForeignKey(
+    batchjob_parse = models.ForeignKey(
         BatchJob, blank=True, null=True, editable=False, on_delete=models.PROTECT
     )
 
     def save(self, *args, **kwargs):
+        # Pre-create batch job.
+        self.batchjob_parse = BatchJob.objects.create()
+        # Save object data.
         super().save(*args, **kwargs)
         # Construct S3 uri for the zipfile.
         bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA", None)
+        # If bucket was specified, run job.
         if bucket:
-            uri = "S3://{}/{}".format(bucket, self.zipfile.name)
-            jobs.push("pixels.stac.parse_training_data", uri)
+            # Get S3 uri for zipfile.
+            uri = "s3://{}/{}".format(bucket, self.zipfile.name)
+            # Push job.
+            job = jobs.push("pixels.stac.parse_training_data", uri)
+            # Register job id.
+            self.batchjob_parse.job_id = job[BATCH_JOB_ID_KEY]
+            self.batchjob_parse.save()
 
 
 def pixels_data_json_upload_to(instance, filename):
@@ -64,7 +74,4 @@ class KerasModel(NamedModel):
     )
     model_json = models.FileField(
         upload_to=keras_model_json_upload_to, null=True, editable=False
-    )
-    batchjob = models.ForeignKey(
-        BatchJob, blank=True, null=True, editable=False, on_delete=models.PROTECT
     )
