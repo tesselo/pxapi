@@ -14,7 +14,7 @@
         "events": [
           {
             "function": "apps.batch.tasks.scan_active_tasks",
-            "expression": "cron(*/5 * * * *)"
+            "expression": "rate(5 minute)"
           },
         ],
         "environment_variables": {
