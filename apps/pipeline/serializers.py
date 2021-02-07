@@ -32,6 +32,7 @@ class PixelsDataSerializer(TesseloBaseSerializer):
     class Meta:
         model = PixelsData
         fields = "__all__"
+        depth = 1
 
 
 class KerasModelSerializer(TesseloBaseSerializer):
