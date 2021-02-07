@@ -1,3 +1,4 @@
+from botocore.exceptions import NoCredentialsError
 from pipeline.models import KerasModel, PixelsData, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
 from pipeline.serializers import (
@@ -6,7 +7,9 @@ from pipeline.serializers import (
     TrainingDataSerializer,
 )
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework_guardian import filters
 
 
@@ -17,11 +20,45 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
     )
     filter_backends = (filters.ObjectPermissionsFilter,)
 
+    _job_field_names = []
+
+    @action(detail=True, methods=["post"])
+    def refresh(self, request, pk):
+        """
+        Update batch job status.
+        """
+        # Get parent object.
+        obj = self.get_object()
+        for field in self._job_field_names:
+            # Get job object.
+            job = getattr(obj, field)
+            # Make sanity checks.
+            if not job:
+                return Response({"error": "No job object found."})
+            if not job.job_id:
+                return Response({"error": "No job id found."})
+            # Update job status.
+            try:
+                job.update()
+                msg = {
+                    "success": 'Updated batch job. New status is "{}".'.format(
+                        job.status
+                    )
+                }
+            except NoCredentialsError:
+                msg = {
+                    "error": "Could not retrieve job details - no credentials found."
+                }
+            # Send response.
+            return Response(msg)
+
 
 class TrainingDataViewSet(TesseloApiViewSet):
     """
-    My Awesome title.
+    Manage training data layers.
     """
+
+    _job_field_names = ["batchjob_parse"]
 
     queryset = TrainingData.objects.all().order_by("pk")
     serializer_class = TrainingDataSerializer
