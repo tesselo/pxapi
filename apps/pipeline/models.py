@@ -30,6 +30,11 @@ class TrainingData(NamedModel):
         upload_to=training_data_zip_upload_to,
         help_text="A zip file containing the training data.",
     )
+    reference_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Set a reference date for all input tiles. Will be used by the stac parser.",
+    )
     batchjob_parse = models.ForeignKey(
         BatchJob, blank=True, null=True, editable=False, on_delete=models.PROTECT
     )
@@ -46,10 +51,19 @@ class TrainingData(NamedModel):
         bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA", None)
         # If bucket was specified, run job.
         if bucket:
-            # Get S3 uri for zipfile.
+            # Get S3 uri for zipfile and other parse variables.
             uri = "s3://{}/{}".format(bucket, self.zipfile.name)
+            save_files = True
+            description = self.name
+            reference_date = self.reference_date
             # Push job.
-            job = jobs.push(self.TRAINING_DATA_PARSE_FUNCTION, uri)
+            job = jobs.push(
+                self.TRAINING_DATA_PARSE_FUNCTION,
+                uri,
+                save_files,
+                description,
+                reference_date,
+            )
             # Register job id and submitted state.
             self.batchjob_parse.job_id = job[BATCH_JOB_ID_KEY]
             self.batchjob_parse.status = BatchJob.SUBMITTED
