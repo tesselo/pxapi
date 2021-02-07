@@ -14,8 +14,8 @@
         "events": [
           {
             "function": "apps.batch.tasks.scan_active_tasks",
-            "expression": "rate(5 minute)"
-          },
+            "expression": "rate(5 minutes)"
+          }
         ],
         "environment_variables": {
           "AWS_REQUEST_PAYER": "requester",
