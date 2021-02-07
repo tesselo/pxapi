@@ -3,6 +3,7 @@ import uuid
 
 import boto3
 from batch import const
+from django.conf import settings
 from django.db import models
 
 
@@ -36,7 +37,7 @@ class BatchJob(models.Model):
         return "{} | {}".format(self.job_id, self.status)
 
     def update(self):
-        batch = boto3.client("batch", region_name=const.REGION_NAME)
+        batch = boto3.client("batch", region_name=settings.AWS_REGION)
         desc = batch.describe_jobs(jobs=[self.job_id])
         if not len(desc["jobs"]):
             self.status = self.UNKNOWN
@@ -63,7 +64,7 @@ class BatchJob(models.Model):
     def get_log(self, limit=500):
         if not self.log_stream_name:
             return {"error": "Log stream name is not specified for this job."}
-        logs = boto3.client("logs", region_name=const.REGION_NAME)
+        logs = boto3.client("logs", region_name=settings.AWS_REGION)
         return logs.get_log_events(
             logGroupName=const.LOG_GROUP_NAME,
             logStreamName=self.log_stream_name,

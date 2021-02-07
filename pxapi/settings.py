@@ -153,7 +153,6 @@ else:
     STATIC_URL = "https://{}.s3.amazonaws.com/".format(
         os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
     )
-    # AWS_S3_REGION_NAME = 'eu-central-1'
     AWS_REGION = "eu-central-1"
     # Media files.
     AWS_S3_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")

@@ -1,6 +1,7 @@
 import datetime
 
 import boto3
+from django.conf import settings
 
 
 def push(funk, *args, array_size=None, cpu=2, gpu=False):
@@ -50,5 +51,5 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False):
         )
 
     # Push job to batch.
-    batch = boto3.client("batch", region_name="eu-central-1")
+    batch = boto3.client("batch", region_name=settings.AWS_REGION)
     return batch.submit_job(**job)
