@@ -49,7 +49,7 @@ class TrainingData(NamedModel):
             # Get S3 uri for zipfile.
             uri = "s3://{}/{}".format(bucket, self.zipfile.name)
             # Push job.
-            job = jobs.push(TRAINING_DATA_PARSE_FUNCTION, uri)
+            job = jobs.push(self.TRAINING_DATA_PARSE_FUNCTION, uri)
             # Register job id and submitted state.
             self.batchjob_parse.job_id = job[BATCH_JOB_ID_KEY]
             self.batchjob_parse.status = BatchJob.SUBMITTED
