@@ -11,6 +11,12 @@
         "log_level": "INFO",
         "timeout_seconds": 30,
         "memory_size": 512,
+        "events": [
+          {
+            "function": "apps.batch.tasks.scan_active_tasks",
+            "expression": "cron(*/5 * * * *)"
+          },
+        ],
         "environment_variables": {
           "AWS_REQUEST_PAYER": "requester",
           "AWS_STORAGE_BUCKET_NAME_MEDIA": "pxapi-media-dev",
