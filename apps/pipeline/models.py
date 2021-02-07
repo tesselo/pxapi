@@ -1,9 +1,12 @@
-import os
+import io
+import json
 import uuid
 
 from batch import jobs
 from batch.const import BATCH_JOB_ID_KEY
 from batch.models import BatchJob
+from django.conf import settings
+from django.core.files import File
 from django.db import models
 
 
@@ -36,7 +39,12 @@ class TrainingData(NamedModel):
         help_text="Set a reference date for all input tiles. Will be used by the stac parser.",
     )
     batchjob_parse = models.ForeignKey(
-        BatchJob, blank=True, null=True, editable=False, on_delete=models.PROTECT
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+        help_text="Background job that creates a STAC catalog from the input data.",
     )
 
     TRAINING_DATA_PARSE_FUNCTION = "pixels.stac.parse_training_data"
@@ -47,12 +55,10 @@ class TrainingData(NamedModel):
             self.batchjob_parse = BatchJob.objects.create()
         # Save object data.
         super().save(*args, **kwargs)
-        # Construct S3 uri for the zipfile.
-        bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA", None)
-        # If bucket was specified, run job.
-        if bucket:
+        # If media bucket was specified, run job.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
             # Get S3 uri for zipfile and other parse variables.
-            uri = "s3://{}/{}".format(bucket, self.zipfile.name)
+            uri = "s3://{}/{}".format(settings.AWS_S3_BUCKET_NAME, self.zipfile.name)
             save_files = "True"
             description = self.name
             reference_date = str(self.reference_date)
@@ -80,6 +86,72 @@ class PixelsData(NamedModel):
     config_file = models.FileField(
         upload_to=pixels_data_json_upload_to, null=True, editable=False
     )
+    batchjob_collect_pixels = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+        related_name="pixels_data_collect",
+    )
+    batchjob_create_catalog = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+        related_name="pixels_data_catalog",
+    )
+
+    CONFIG_FILE_NAME = "config.json"
+    COLLECT_PIXELS_FUNCTION = "pixels.stac.collect_from_catalog"
+    CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"
+
+    def save(self, *args, **kwargs):
+        # Save a copy of the config data as file for the DB independent batch
+        # processing.
+        self.config_file = File(
+            io.StringIO(json.dumps(self.config)), name=self.CONFIG_FILE_NAME
+        )
+        # Pre-create batch jobs.
+        if not self.batchjob_collect_pixels:
+            self.batchjob_collect_pixels = BatchJob.objects.create()
+        if not self.batchjob_create_catalog:
+            self.batchjob_create_catalog = BatchJob.objects.create()
+        super().save(*args, **kwargs)
+
+        # If media bucket was specified, run job.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            # Get S3 uri for pixels config file.
+            config_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.config_file.name
+            )
+            # Get S3 uri for Y catalog file.
+            catalog_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
+            )
+            # Push collection job.
+            collect_job = jobs.push(
+                self.COLLECT_PIXELS_FUNCTION,
+                catalog_uri,
+                config_uri,
+            )
+            # Register collection job id and submitted state.
+            self.batchjob_collect_pixels.job_id = collect_job[BATCH_JOB_ID_KEY]
+            self.batchjob_collect_pixels.status = BatchJob.SUBMITTED
+            self.batchjob_collect_pixels.save()
+            # Construct catalog base url.
+            new_catalog_uri = config_uri.strip(self.CONFIG_FILE_NAME)
+            # Push cataloging job, with the collection job as dependency.
+            catalog_job = jobs.push(
+                self.CREATE_CATALOG_FUNCTION,
+                new_catalog_uri,
+                depends_on=[collect_job[BATCH_JOB_ID_KEY]],
+            )
+            # Register parse job id and submitted state.
+            self.batchjob_create_catalog.job_id = catalog_job[BATCH_JOB_ID_KEY]
+            self.batchjob_create_catalog.status = BatchJob.SUBMITTED
+            self.batchjob_create_catalog.save()
 
 
 def keras_model_json_upload_to(instance, filename):

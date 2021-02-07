@@ -4,9 +4,33 @@ import boto3
 from django.conf import settings
 
 
-def push(funk, *args, array_size=None, cpu=2, gpu=False):
+def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
     """
     Push batch job.
+
+    High level utility to push batch jobs. Allows running any module,
+    specifying instance types, and job dependencies.
+
+    Parameters
+    ----------
+    funk: str
+        The module path to the function that shall be ran. For example,
+        pixels.stac.parse_training_data.
+    args: positional input arguments, optional
+        Positional arguments that will be passed to "funk".
+    array_size: int, optional
+        Array size for the given input job. If this is not None, the batch job
+        will be sent as array job, otherwise as regular batch job.
+    cpu: int, optional
+        Number of CPUs that are required for the job. Memory is automatically
+        determined from the number of CPUs. This is ignored if gpu is True.
+    gpu: boolean, optional
+        Determines if the job shall be executed in a GPU enabled instance or
+        not. If true, 1 GPU instance will be ran with 8 CPU cores and 32 GB of
+        memory.
+    depends_on: list of job IDs, optional
+        A list of batch job IDs from which the new job depends. If specified,
+        the new job will only be executed if the dependencies were successful.
     """
     # Create job dict, inserting job name and command to execute.
     job = {
@@ -49,7 +73,9 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False):
                 "memory": 1024 * cpu,
             }
         )
-
+    # Set job dependency.
+    if depends_on is not None:
+        job["dependsOn"] = [{"jobId": dependency} for dependency in depends_on]
     # Push job to batch.
     batch = boto3.client("batch", region_name=settings.AWS_REGION)
     return batch.submit_job(**job)
