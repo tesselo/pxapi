@@ -53,9 +53,9 @@ class TrainingData(NamedModel):
         if bucket:
             # Get S3 uri for zipfile and other parse variables.
             uri = "s3://{}/{}".format(bucket, self.zipfile.name)
-            save_files = True
+            save_files = "True"
             description = self.name
-            reference_date = self.reference_date
+            reference_date = str(self.reference_date)
             # Push job.
             job = jobs.push(
                 self.TRAINING_DATA_PARSE_FUNCTION,
