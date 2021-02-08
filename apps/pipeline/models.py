@@ -8,8 +8,8 @@ from batch.models import BatchJob
 from django.conf import settings
 from django.core.files import File
 from django.db import models
+from utils import get_catalog_length
 
-from pixels.stac import get_catalog_length
 
 class NamedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -133,8 +133,9 @@ class PixelsData(NamedModel):
             )
             # TODO: Item per job definition.
             number_of_jobs = 100
-            # Get umber of item in catalog, load it here or import from pixels?
+            # Get number of item in catalog.
             number_of_items = get_catalog_length(catalog_uri)
+            # Compute number of items per job.
             item_per_job = number_of_items / number_of_jobs
             # Push collection job.
             collect_job = jobs.push(
