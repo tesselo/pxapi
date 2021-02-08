@@ -1,7 +1,9 @@
-import pystac
-import boto3
-
 from urllib.parse import urlparse
+
+import boto3
+import pystac
+from pystac import STAC_IO
+
 
 def stac_s3_read_method(uri):
     parsed = urlparse(uri)
@@ -13,6 +15,7 @@ def stac_s3_read_method(uri):
         return obj.get()["Body"].read().decode("utf-8")
     else:
         return STAC_IO.default_read_text_method(uri)
+
 
 def get_catalog_length(catalog_path):
     if catalog_path.startswith("s3"):

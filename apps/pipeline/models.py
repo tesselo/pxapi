@@ -8,6 +8,7 @@ from batch.models import BatchJob
 from django.conf import settings
 from django.core.files import File
 from django.db import models
+
 from utils import get_catalog_length
 
 
@@ -151,7 +152,9 @@ class PixelsData(NamedModel):
             # Construct catalog base url.
             new_catalog_uri = config_uri.strip(self.CONFIG_FILE_NAME)
             # Get zip file path to pass to collection.
-            source_path = "s3://{}/{}".format(settings.AWS_S3_BUCKET_NAME, self.zipfile.name)
+            source_path = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.zipfile.name
+            )
             # Push cataloging job, with the collection job as dependency.
             catalog_job = jobs.push(
                 self.CREATE_CATALOG_FUNCTION,
