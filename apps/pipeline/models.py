@@ -136,7 +136,7 @@ class PixelsData(NamedModel):
                 settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
             )
             # TODO: Item per job definition.
-            number_of_jobs = 100
+            number_of_jobs = 1
             # Get number of item in catalog.
             number_of_items = get_catalog_length(catalog_uri)
             # Compute number of items per job.
