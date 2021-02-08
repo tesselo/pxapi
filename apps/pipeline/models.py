@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.files import File
 from django.db import models
 
-from utils import get_catalog_length
+from pipeline.utils import get_catalog_length
 
 
 class NamedModel(models.Model):
@@ -63,7 +63,10 @@ class TrainingData(NamedModel):
             uri = "s3://{}/{}".format(settings.AWS_S3_BUCKET_NAME, self.zipfile.name)
             save_files = "True"
             description = self.name
-            reference_date = str(self.reference_date)
+            if self.reference_date:
+                reference_date = str(self.reference_date)
+            else:
+                reference_date = None
             # Push job.
             job = jobs.push(
                 self.TRAINING_DATA_PARSE_FUNCTION,
