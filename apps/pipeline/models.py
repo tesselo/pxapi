@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.files import File
 from django.db import models
 
+from utils import get_catalog_length
+
 
 class NamedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -104,7 +106,7 @@ class PixelsData(NamedModel):
     )
 
     CONFIG_FILE_NAME = "config.json"
-    COLLECT_PIXELS_FUNCTION = "pixels.stac.collect_from_catalog"
+    COLLECT_PIXELS_FUNCTION = "pixels.stac.collect_from_catalog_subsection"
     CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"
 
     def save(self, *args, **kwargs):
@@ -130,11 +132,18 @@ class PixelsData(NamedModel):
             catalog_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
             )
+            # TODO: Item per job definition.
+            number_of_jobs = 100
+            # Get number of item in catalog.
+            number_of_items = get_catalog_length(catalog_uri)
+            # Compute number of items per job.
+            item_per_job = number_of_items / number_of_jobs
             # Push collection job.
             collect_job = jobs.push(
                 self.COLLECT_PIXELS_FUNCTION,
                 catalog_uri,
                 config_uri,
+                item_per_job,
             )
             # Register collection job id and submitted state.
             self.batchjob_collect_pixels.job_id = collect_job[BATCH_JOB_ID_KEY]
@@ -142,10 +151,15 @@ class PixelsData(NamedModel):
             self.batchjob_collect_pixels.save()
             # Construct catalog base url.
             new_catalog_uri = config_uri.strip(self.CONFIG_FILE_NAME)
+            # Get zip file path to pass to collection.
+            source_path = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.zipfile.name
+            )
             # Push cataloging job, with the collection job as dependency.
             catalog_job = jobs.push(
                 self.CREATE_CATALOG_FUNCTION,
                 new_catalog_uri,
+                source_path,
                 depends_on=[collect_job[BATCH_JOB_ID_KEY]],
             )
             # Register parse job id and submitted state.
