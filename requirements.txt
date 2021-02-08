@@ -8,3 +8,4 @@ PyYAML==5.4.1
 uritemplate==3.0.1
 psycopg2-binary==2.8.6
 django-s3-storage==0.13.4
+sat-stac==0.4.0
