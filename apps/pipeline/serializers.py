@@ -37,7 +37,6 @@ class PixelsDataSerializer(TesseloBaseSerializer):
             "batchjob_create_catalog",
             "config_file",
         ]
-        depth = 1
 
 
 class KerasModelSerializer(TesseloBaseSerializer):
