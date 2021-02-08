@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.files import File
 from django.db import models
 
+from pixels.stac import get_catalog_length
 
 class NamedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -130,8 +131,11 @@ class PixelsData(NamedModel):
             catalog_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
             )
-            # TODO: Item per job definition
-            item_per_job = 100
+            # TODO: Item per job definition.
+            number_of_jobs = 100
+            # Get umber of item in catalog, load it here or import from pixels?
+            number_of_items = get_catalog_length(catalog_uri)
+            item_per_job = number_of_items / number_of_jobs
             # Push collection job.
             collect_job = jobs.push(
                 self.COLLECT_PIXELS_FUNCTION,
