@@ -32,6 +32,7 @@ class PixelsDataSerializer(TesseloBaseSerializer):
     class Meta:
         model = PixelsData
         fields = "__all__"
+        read_only_fields = ["batchjob_collect_pixels", "batchjob_create_catalog", "config_file"]
         depth = 1
 
 
