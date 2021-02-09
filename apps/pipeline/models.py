@@ -143,6 +143,8 @@ class PixelsData(NamedModel):
                 os.path.dirname(self.trainingdata.zipfile.name),
             )
             logger.debug(f"The catalog uri is {catalog_uri}.")
+            # TODO: Make sure the catalog exists, i.e. that the previous job
+            # has finished. This currently leads to a server error.
             # Count number of items in the catalog.
             number_of_items = get_catalog_length(catalog_uri)
             # TODO: Item per job definition.
@@ -166,7 +168,7 @@ class PixelsData(NamedModel):
             logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
-                settings.AWS_S3_BUCKET_NAME, self.zipfile.name
+                settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
             )
             # Push cataloging job, with the collection job as dependency.
             catalog_job = jobs.push(
