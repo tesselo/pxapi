@@ -136,8 +136,9 @@ class PixelsData(NamedModel):
             )
             logger.debug(f"The config uri is {config_uri}.")
             # Get S3 uri for Y catalog file.
-            catalog_uri = "s3://{}/{}".format(
-                settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
+            catalog_uri = "s3://{}/{}/stac/catalog.json".format(
+                settings.AWS_S3_BUCKET_NAME,
+                os.path.dirname(self.trainingdata.zipfile.name),
             )
             logger.debug(f"The catalog uri is {catalog_uri}.")
             # TODO: Item per job definition.
