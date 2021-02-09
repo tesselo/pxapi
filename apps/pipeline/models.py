@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 import uuid
 
 from batch import jobs
@@ -8,8 +9,9 @@ from batch.models import BatchJob
 from django.conf import settings
 from django.core.files import File
 from django.db import models
-
 from pipeline.utils import get_catalog_length
+
+logger = logging.getLogger(__name__)
 
 
 class NamedModel(models.Model):
@@ -61,6 +63,7 @@ class TrainingData(NamedModel):
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
             # Get S3 uri for zipfile and other parse variables.
             uri = "s3://{}/{}".format(settings.AWS_S3_BUCKET_NAME, self.zipfile.name)
+            logger.debug(f"The zipfile uri is {uri}.")
             save_files = "True"
             description = self.name
             if self.reference_date:
@@ -131,10 +134,12 @@ class PixelsData(NamedModel):
             config_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.config_file.name
             )
+            logger.debug(f"The config uri is {config_uri}.")
             # Get S3 uri for Y catalog file.
             catalog_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.trainingdata.zipfile.name
             )
+            logger.debug(f"The catalog uri is {catalog_uri}.")
             # TODO: Item per job definition.
             number_of_jobs = 1
             # Get number of item in catalog.
