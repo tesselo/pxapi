@@ -1,6 +1,7 @@
 import io
 import json
 import logging
+import os
 import uuid
 
 from batch import jobs
