@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import uuid
+import math
 
 from batch import jobs
 from batch.const import BATCH_JOB_ID_KEY
@@ -142,12 +143,13 @@ class PixelsData(NamedModel):
                 os.path.dirname(self.trainingdata.zipfile.name),
             )
             logger.debug(f"The catalog uri is {catalog_uri}.")
+            # Count number of items in the catalog.
+            number_of_items = get_catalog_length(catalog_uri)
             # TODO: Item per job definition.
             number_of_jobs = 1
-            # Get number of item in catalog.
-            number_of_items = get_catalog_length(catalog_uri)
-            # Compute number of items per job.
-            item_per_job = number_of_items / number_of_jobs
+            # Compute number of items per job and convert to string because all
+            # batch config arguments are required to be str.
+            item_per_job = str(math.ceil(number_of_items / number_of_jobs))
             # Push collection job.
             collect_job = jobs.push(
                 self.COLLECT_PIXELS_FUNCTION,
@@ -161,6 +163,7 @@ class PixelsData(NamedModel):
             self.batchjob_collect_pixels.save()
             # Construct catalog base url.
             new_catalog_uri = config_uri.strip(self.CONFIG_FILE_NAME)
+            logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.zipfile.name
