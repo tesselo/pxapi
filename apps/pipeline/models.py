@@ -1,9 +1,9 @@
 import io
 import json
 import logging
+import math
 import os
 import uuid
-import math
 
 from batch import jobs
 from batch.const import BATCH_JOB_ID_KEY
