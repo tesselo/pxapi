@@ -65,10 +65,19 @@ class TrainingDataViewSet(TesseloApiViewSet):
 
 
 class PixelsDataViewSet(TesseloApiViewSet):
+    """
+    Manage satellite image pixels collections.
+    """
+
+    _job_field_names = ["batchjob_collect_pixels", "batchjob_create_catalog"]
+
     queryset = PixelsData.objects.all().order_by("pk")
     serializer_class = PixelsDataSerializer
 
 
 class KerasModelViewSet(TesseloApiViewSet):
+
+    _job_field_names = ["batchjob_train"]
+
     queryset = KerasModel.objects.all().order_by("pk")
     serializer_class = KerasModelSerializer
