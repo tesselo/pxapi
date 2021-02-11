@@ -11,8 +11,8 @@ from batch.models import BatchJob
 from django.conf import settings
 from django.core.files import File
 from django.db import models
-from pipeline.utils import get_catalog_length
 from pipeline import const
+from pipeline.utils import get_catalog_length
 
 logger = logging.getLogger(__name__)
 
