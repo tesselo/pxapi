@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                     models.FileField(
                         editable=False,
                         null=True,
-                        upload_to=pipeline.models.keras_model_h5_upload_to,
+                        upload_to="keras_model_h5_upload_to",
                     ),
                 ),
                 (
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
                     models.FileField(
                         editable=False,
                         null=True,
-                        upload_to=pipeline.models.keras_model_json_upload_to,
+                        upload_to="keras_model_json_upload_to",
                     ),
                 ),
                 (
