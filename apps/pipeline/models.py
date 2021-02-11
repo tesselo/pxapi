@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.files import File
 from django.db import models
 from pipeline.utils import get_catalog_length
+from pipeline import const
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +54,6 @@ class TrainingData(NamedModel):
         help_text="Background job that creates a STAC catalog from the input data.",
     )
 
-    TRAINING_DATA_PARSE_FUNCTION = "pixels.stac.parse_training_data"
-
     def save(self, *args, **kwargs):
         # Pre-create batch job.
         if not self.batchjob_parse:
@@ -74,7 +73,7 @@ class TrainingData(NamedModel):
                 reference_date = None
             # Push job.
             job = jobs.push(
-                self.TRAINING_DATA_PARSE_FUNCTION,
+                const.TRAINING_DATA_PARSE_FUNCTION,
                 uri,
                 save_files,
                 description,
@@ -87,7 +86,7 @@ class TrainingData(NamedModel):
 
 
 def pixels_data_json_upload_to(instance, filename):
-    return f"pixelsdata/{instance.pk}/config.json"
+    return f"pixelsdata/{instance.pk}/{const.CONFIG_FILE_NAME}"
 
 
 class PixelsData(NamedModel):
@@ -113,15 +112,18 @@ class PixelsData(NamedModel):
         related_name="pixels_data_catalog",
     )
 
-    CONFIG_FILE_NAME = "config.json"
-    COLLECT_PIXELS_FUNCTION = "pixels.stac.collect_from_catalog_subsection"
-    CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"
+    @property
+    def catalog_uri(self):
+        return "s3://{}/{}/stac/catalog.json".format(
+            settings.AWS_S3_BUCKET_NAME,
+            os.path.dirname(self.config_file.name),
+        )
 
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
         # processing.
         self.config_file = File(
-            io.StringIO(json.dumps(self.config)), name=self.CONFIG_FILE_NAME
+            io.StringIO(json.dumps(self.config)), name=const.CONFIG_FILE_NAME
         )
         # Pre-create batch jobs.
         if not self.batchjob_collect_pixels:
@@ -154,7 +156,7 @@ class PixelsData(NamedModel):
             item_per_job = str(math.ceil(number_of_items / number_of_jobs))
             # Push collection job.
             collect_job = jobs.push(
-                self.COLLECT_PIXELS_FUNCTION,
+                const.COLLECT_PIXELS_FUNCTION,
                 catalog_uri,
                 config_uri,
                 item_per_job,
@@ -164,7 +166,7 @@ class PixelsData(NamedModel):
             self.batchjob_collect_pixels.status = BatchJob.SUBMITTED
             self.batchjob_collect_pixels.save()
             # Construct catalog base url.
-            new_catalog_uri = config_uri.strip(self.CONFIG_FILE_NAME)
+            new_catalog_uri = config_uri.strip(const.CONFIG_FILE_NAME)
             logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
@@ -172,7 +174,7 @@ class PixelsData(NamedModel):
             )
             # Push cataloging job, with the collection job as dependency.
             catalog_job = jobs.push(
-                self.CREATE_CATALOG_FUNCTION,
+                const.CREATE_CATALOG_FUNCTION,
                 new_catalog_uri,
                 source_path,
                 depends_on=[collect_job[BATCH_JOB_ID_KEY]],
@@ -183,19 +185,79 @@ class PixelsData(NamedModel):
             self.batchjob_create_catalog.save()
 
 
-def keras_model_json_upload_to(instance, filename):
-    return f"kerasmodel/{instance.pk}/model.json"
+def model_configuration_file_upload_to(instance, filename):
+    return f"kerasmodel/{instance.pk}/{const.MODEL_CONFIGURATION_FILE_NAME}"
 
 
-def keras_model_h5_upload_to(instance, filename):
-    return f"kerasmodel/{instance.pk}/model.h5"
+def model_compile_arguments_file_upload_to(instance, filename):
+    return f"kerasmodel/{instance.pk}/{const.MODEL_COMPILE_ARGUMENTS_FILE_NAME}"
+
+
+def model_fit_arguments_file_upload_to(instance, filename):
+    return f"kerasmodel/{instance.pk}/{const.MODEL_FIT_ARGUMENTS_FILE_NAME}"
 
 
 class KerasModel(NamedModel):
-    definition = models.JSONField(default=dict, blank=True)
-    model_h5 = models.FileField(
-        upload_to=keras_model_h5_upload_to, null=True, editable=False
+    model_configuration = models.JSONField(default=dict, blank=True)
+    model_configuration_file = models.FileField(
+        upload_to=model_configuration_file_upload_to, null=True, editable=False
     )
-    model_json = models.FileField(
-        upload_to=keras_model_json_upload_to, null=True, editable=False
+    model_compile_arguments = models.JSONField(default=dict, blank=True)
+    model_compile_arguments_file = models.FileField(
+        upload_to=model_compile_arguments_file_upload_to, null=True, editable=False
     )
+    model_fit_arguments = models.JSONField(default=dict, blank=True)
+    model_fit_arguments_file = models.FileField(
+        upload_to=model_fit_arguments_file_upload_to, null=True, editable=False
+    )
+    batchjob_train = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+    )
+
+    def save(self, *args, **kwargs):
+        # Save a copy of the model definition as file for the DB independent
+        # batch processing.
+        self.model_configuration_file = File(
+            io.StringIO(json.dumps(self.model_configuration)),
+            name=self.CONFIG_FILE_NAME,
+        )
+        self.model_compile_arguments_file = File(
+            io.StringIO(json.dumps(self.model_compile_arguments)),
+            name=self.CONFIG_FILE_NAME,
+        )
+        self.model_fit_arguments_file = File(
+            io.StringIO(json.dumps(self.model_fit_arguments)),
+            name=self.CONFIG_FILE_NAME,
+        )
+        # Pre-create batch jobs.
+        if not self.batchjob_train:
+            self.batchjob_train = BatchJob.objects.create()
+        super().save(*args, **kwargs)
+        # If media bucket was specified, run job.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            # Get model definition uris.
+            model_config_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.model_configuration_file.name
+            )
+            model_compile_arguments_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.model_compile_arguments_file.name
+            )
+            model_fit_arguments_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.model_fit_arguments_file.name
+            )
+            # Push cataloging job, with the collection job as dependency.
+            train_job = jobs.push(
+                const.TRAIN_MODEL_FUNCTION,
+                self.pixelsdata.catalog_uri,
+                model_config_uri,
+                model_compile_arguments_uri,
+                model_fit_arguments_uri,
+            )
+            # Register job id and submitted state.
+            self.batchjob_train.job_id = train_job[BATCH_JOB_ID_KEY]
+            self.batchjob_train.status = BatchJob.SUBMITTED
+            self.batchjob_train.save()
