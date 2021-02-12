@@ -1,4 +1,3 @@
-import io
 import json
 import logging
 import math
@@ -9,7 +8,7 @@ from batch import jobs
 from batch.const import BATCH_JOB_ID_KEY
 from batch.models import BatchJob
 from django.conf import settings
-from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
 from pipeline.utils import get_catalog_length
@@ -122,9 +121,9 @@ class PixelsData(NamedModel):
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
         # processing.
-        config_io = io.StringIO()
-        json.dump(self.config, config_io)
-        self.config_file = File(config_io, name=const.CONFIG_FILE_NAME)
+        self.config_file = ContentFile(
+            json.dumps(self.config), name=const.CONFIG_FILE_NAME
+        )
         # Pre-create batch jobs.
         if not self.batchjob_collect_pixels:
             self.batchjob_collect_pixels = BatchJob.objects.create()
@@ -221,24 +220,18 @@ class KerasModel(NamedModel):
     def save(self, *args, **kwargs):
         # Save a copy of the model definition as file for the DB independent
         # batch processing.
-        model_configuration_io = io.StringIO()
-        json.dump(self.model_configuration, model_configuration_io)
-        self.model_configuration_file = File(
-            model_configuration_io, name=const.MODEL_CONFIGURATION_FILE_NAME
+        self.model_configuration_file = ContentFile(
+            json.dumps(self.model_configuration),
+            name=const.MODEL_CONFIGURATION_FILE_NAME,
         )
-
-        model_compile_arguments_io = io.StringIO()
-        json.dump(self.model_compile_arguments, model_compile_arguments_io)
-        self.model_compile_arguments_file = File(
-            model_compile_arguments_io, name=const.MODEL_COMPILE_ARGUMENTS_FILE_NAME
+        self.model_compile_arguments_file = ContentFile(
+            json.dumps(self.model_compile_arguments),
+            name=const.MODEL_COMPILE_ARGUMENTS_FILE_NAME,
         )
-
-        model_fit_arguments_io = io.StringIO()
-        json.dump(self.model_fit_arguments, model_fit_arguments_io)
-        self.model_fit_arguments_file = File(
-            model_fit_arguments_io, name=const.MODEL_FIT_ARGUMENTS_FILE_NAME
+        self.model_fit_arguments_file = ContentFile(
+            json.dumps(self.model_fit_arguments),
+            name=const.MODEL_FIT_ARGUMENTS_FILE_NAME,
         )
-
         # Pre-create batch jobs.
         if not self.batchjob_train:
             self.batchjob_train = BatchJob.objects.create()
