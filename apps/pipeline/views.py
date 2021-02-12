@@ -29,28 +29,55 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         """
         # Get parent object.
         obj = self.get_object()
+        messages = []
         for field in self._job_field_names:
             # Get job object.
             job = getattr(obj, field)
             # Make sanity checks.
             if not job:
-                return Response({"error": "No job object found."})
-            if not job.job_id:
-                return Response({"error": "No job id found."})
-            # Update job status.
-            try:
-                job.update()
-                msg = {
-                    "success": 'Updated batch job. New status is "{}".'.format(
-                        job.status
-                    )
-                }
-            except NoCredentialsError:
-                msg = {
-                    "error": "Could not retrieve job details - no credentials found."
-                }
-            # Send response.
-            return Response(msg)
+                msg = {"job_field": field, "error": "No job object found."}
+            elif not job.job_id:
+                msg = {"job_field": field, "error": "No job id found."}
+            else:
+                try:
+                    # Update job status.
+                    job.update()
+                    msg = {
+                        "job_id": job.job_id,
+                        "success": 'Updated batch job. New status is "{}".'.format(
+                            job.status
+                        ),
+                    }
+                except NoCredentialsError:
+                    msg = {
+                        "job_id": job.job_id,
+                        "error": "Could not retrieve job details - no credentials found.",
+                    }
+            messages.append(msg)
+        # Send job update messages.
+        return Response(messages)
+
+    @action(detail=True, methods=["get"])
+    def logs(self, request, pk):
+        """
+        Obtain job log.
+        """
+        obj = self.get_object()
+        messages = []
+        for field in self._job_field_names:
+            # Get job object.
+            job = getattr(obj, field)
+            # Make sanity checks.
+            if not job:
+                msg = {"job_field": field, "error": "No job object found."}
+            elif not job.job_id:
+                msg = {"job_field": field, "error": "No job id found."}
+            else:
+                # Get job log.
+                msg = job.get_log()
+            messages.append(msg)
+        # Send job logs.
+        return Response(messages)
 
 
 class TrainingDataViewSet(TesseloApiViewSet):
