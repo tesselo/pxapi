@@ -196,7 +196,17 @@ def model_fit_arguments_file_upload_to(instance, filename):
     return f"kerasmodel/{instance.pk}/{const.MODEL_FIT_ARGUMENTS_FILE_NAME}"
 
 
+def model_generator_arguments_file_upload_to(instance, filename):
+    return f"kerasmodel/{instance.pk}/{const.GENERATOR_ARGUMENTS_FILE_NAME}"
+
+
 class KerasModel(NamedModel):
+    """
+    Train and save keras models.
+    """
+
+    pixelsdata = models.ForeignKey(PixelsData, on_delete=models.PROTECT)
+
     model_configuration = models.JSONField(default=dict, blank=True)
     model_configuration_file = models.FileField(
         upload_to=model_configuration_file_upload_to, null=True, editable=False
@@ -209,6 +219,11 @@ class KerasModel(NamedModel):
     model_fit_arguments_file = models.FileField(
         upload_to=model_fit_arguments_file_upload_to, null=True, editable=False
     )
+    generator_arguments = models.JSONField(default=dict, blank=True)
+    generator_arguments = models.FileField(
+        upload_to=model_generator_arguments_file_upload_to, null=True, editable=False
+    )
+
     batchjob_train = models.ForeignKey(
         BatchJob,
         blank=True,
