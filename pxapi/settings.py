@@ -159,6 +159,7 @@ else:
     DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_FILE_OVERWRITE = True
+    AWS_S3_GZIP = False
     # Static files.
     AWS_S3_BUCKET_NAME_STATIC = os.environ.get("AWS_STORAGE_BUCKET_NAME_STATIC")
     STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
