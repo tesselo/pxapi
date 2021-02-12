@@ -122,9 +122,9 @@ class PixelsData(NamedModel):
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
         # processing.
-        self.config_file = File(
-            io.StringIO(json.dumps(self.config)), name=const.CONFIG_FILE_NAME
-        )
+        config_io = io.StringIO()
+        json.dump(self.config, config_io)
+        self.config_file = File(config_io, name=const.CONFIG_FILE_NAME)
         # Pre-create batch jobs.
         if not self.batchjob_collect_pixels:
             self.batchjob_collect_pixels = BatchJob.objects.create()
@@ -221,18 +221,24 @@ class KerasModel(NamedModel):
     def save(self, *args, **kwargs):
         # Save a copy of the model definition as file for the DB independent
         # batch processing.
+        model_configuration_io = io.StringIO()
+        json.dump(self.model_configuration, model_configuration_io)
         self.model_configuration_file = File(
-            io.StringIO(json.dumps(self.model_configuration)),
-            name=self.CONFIG_FILE_NAME,
+            model_configuration_io, name=const.MODEL_CONFIGURATION_FILE_NAME
         )
+
+        model_compile_arguments_io = io.StringIO()
+        json.dump(self.model_compile_arguments, model_compile_arguments_io)
         self.model_compile_arguments_file = File(
-            io.StringIO(json.dumps(self.model_compile_arguments)),
-            name=self.CONFIG_FILE_NAME,
+            model_compile_arguments_io, name=const.MODEL_COMPILE_ARGUMENTS_FILE_NAME
         )
+
+        model_fit_arguments_io = io.StringIO()
+        json.dump(self.model_fit_arguments, model_fit_arguments_io)
         self.model_fit_arguments_file = File(
-            io.StringIO(json.dumps(self.model_fit_arguments)),
-            name=self.CONFIG_FILE_NAME,
+            model_fit_arguments_io, name=const.MODEL_FIT_ARGUMENTS_FILE_NAME
         )
+
         # Pre-create batch jobs.
         if not self.batchjob_train:
             self.batchjob_train = BatchJob.objects.create()
