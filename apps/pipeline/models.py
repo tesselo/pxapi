@@ -164,8 +164,9 @@ class PixelsData(NamedModel):
             self.batchjob_collect_pixels.job_id = collect_job[BATCH_JOB_ID_KEY]
             self.batchjob_collect_pixels.status = BatchJob.SUBMITTED
             self.batchjob_collect_pixels.save()
-            # Construct catalog base url.
-            new_catalog_uri = config_uri.strip(const.CONFIG_FILE_NAME)
+            # Construct catalog base url from config url by stripping the config
+            # file name from the config uri.
+            new_catalog_uri = config_uri.rstrip(const.CONFIG_FILE_NAME)
             logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
