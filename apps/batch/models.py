@@ -75,5 +75,5 @@ class BatchJob(models.Model):
             "{} | {}".format(
                 datetime.datetime.fromtimestamp(dat["timestamp"] / 1000), dat["message"]
             )
-            for dat in log_data['events']
+            for dat in log_data["events"]
         ]
