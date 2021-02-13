@@ -65,16 +65,18 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         obj = self.get_object()
         messages = []
         for field in self._job_field_names:
-            # Get job object.
+            # Get job object through job field.
             job = getattr(obj, field)
+            # Prepare base message.
+            msg = {"job_field": field}
             # Make sanity checks.
             if not job:
-                msg = {"job_field": field, "error": "No job object found."}
+                msg.update({"error": "No job object found."})
             elif not job.job_id:
-                msg = {"job_field": field, "error": "No job id found."}
+                msg.update({"error": "No job ID found."})
             else:
                 # Get job log.
-                msg = job.get_log()
+                msg.update({"events": job.get_log()})
             messages.append(msg)
         # Send job logs.
         return Response(messages)

@@ -1,3 +1,4 @@
+import datetime
 import json
 import uuid
 
@@ -64,9 +65,15 @@ class BatchJob(models.Model):
     def get_log(self, limit=500):
         if not self.log_stream_name:
             return {"error": "Log stream name is not specified for this job."}
-        logs = boto3.client("logs", region_name=settings.AWS_REGION)
-        return logs.get_log_events(
+        client = boto3.client("logs", region_name=settings.AWS_REGION)
+        log_data = client.get_log_events(
             logGroupName=const.LOG_GROUP_NAME,
             logStreamName=self.log_stream_name,
             limit=limit,
         )
+        return [
+            "{} | {}".format(
+                datetime.datetime.fromtimestamp(dat["timestamp"] / 1000), dat["message"]
+            )
+            for dat in log_data['events']
+        ]
