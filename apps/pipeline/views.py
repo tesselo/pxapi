@@ -1,3 +1,4 @@
+from batch.const import BATCH_JOB_FINAL_STATUSES
 from botocore.exceptions import NoCredentialsError
 from pipeline.models import KerasModel, PixelsData, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
@@ -22,7 +23,7 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
 
     _job_field_names = []
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["get"])
     def refresh(self, request, pk):
         """
         Update batch job status.
@@ -35,23 +36,30 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
             job = getattr(obj, field)
             # Make sanity checks.
             if not job:
-                msg = {"job_field": field, "error": "No job object found."}
+                msg = {"job_field": field, "message": "No job object found."}
             elif not job.job_id:
-                msg = {"job_field": field, "error": "No job id found."}
+                msg = {"job_field": field, "message": "No job id found."}
+            elif job.status in BATCH_JOB_FINAL_STATUSES:
+                msg = {
+                    "job_field": field,
+                    "message": "Nothing to do, job was already in final status {}.".format(
+                        job.status
+                    ),
+                }
             else:
                 try:
                     # Update job status.
                     job.update()
                     msg = {
                         "job_id": job.job_id,
-                        "success": 'Updated batch job. New status is "{}".'.format(
+                        "message": 'Updated batch job. New status is "{}".'.format(
                             job.status
                         ),
                     }
                 except NoCredentialsError:
                     msg = {
                         "job_id": job.job_id,
-                        "error": "Could not retrieve job details - no credentials found.",
+                        "message": "Could not retrieve job details - no credentials found.",
                     }
             messages.append(msg)
         # Send job update messages.
@@ -71,9 +79,9 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
             msg = {"job_field": field}
             # Make sanity checks.
             if not job:
-                msg.update({"error": "No job object found."})
+                msg.update({"message": "No job object found."})
             elif not job.job_id:
-                msg.update({"error": "No job ID found."})
+                msg.update({"message": "No job ID found."})
             else:
                 # Get job log.
                 msg.update({"events": job.get_log()})
