@@ -1,5 +1,6 @@
 from batch.const import BATCH_JOB_FINAL_STATUSES
 from botocore.exceptions import NoCredentialsError
+from drf_spectacular.utils import extend_schema, inline_serializer
 from pipeline.models import KerasModel, PixelsData, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
 from pipeline.serializers import (
@@ -7,7 +8,7 @@ from pipeline.serializers import (
     PixelsDataSerializer,
     TrainingDataSerializer,
 )
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,10 +24,19 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
 
     _job_field_names = []
 
+    @extend_schema(
+        responses=inline_serializer(
+            name="Refresh",
+            fields={
+                "job_field": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     @action(detail=True, methods=["get"])
     def refresh(self, request, pk):
         """
-        Update batch job status.
+        Update batch job statuses.
         """
         # Get parent object.
         obj = self.get_object()
@@ -65,10 +75,20 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         # Send job update messages.
         return Response(messages)
 
+    @extend_schema(
+        responses=inline_serializer(
+            name="Logs",
+            fields={
+                "job_field": serializers.CharField(),
+                "message": serializers.CharField(),
+                "events": serializers.JSONField(),
+            },
+        ),
+    )
     @action(detail=True, methods=["get"])
     def logs(self, request, pk):
         """
-        Obtain job log.
+        Obtain batch job logs.
         """
         obj = self.get_object()
         messages = []
@@ -79,12 +99,17 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
             msg = {"job_field": field}
             # Make sanity checks.
             if not job:
-                msg.update({"message": "No job object found."})
+                msg.update({"message": "No job object found.", "events": {}})
             elif not job.job_id:
-                msg.update({"message": "No job ID found."})
+                msg.update({"message": "No job ID found.", "events": {}})
             else:
                 # Get job log.
-                msg.update({"events": job.get_log()})
+                msg.update(
+                    {
+                        "message": "Job log retrieved successfully.",
+                        "events": job.get_log(),
+                    }
+                )
             messages.append(msg)
         # Send job logs.
         return Response(messages)

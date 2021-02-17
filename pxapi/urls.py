@@ -15,28 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
-from rest_framework.schemas import get_schema_view
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 from pxapi.apiurls import apiurlpatterns
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "openapi",
-        get_schema_view(
-            title="Pixels API", description="A pixel grabber engine.", version="1.0.0"
-        ),
-        name="openapi-schema",
+        "swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
-    path(
-        "docs/",
-        TemplateView.as_view(
-            template_name="redoc.html", extra_context={"schema_url": "openapi-schema"}
-        ),
-        name="redoc",
-    ),
+    path("docs/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
 
 urlpatterns += apiurlpatterns
