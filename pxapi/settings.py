@@ -94,7 +94,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "tesselo"),
+            "NAME": os.environ.get("DB_NAME_PXAPI", "tesselo"),
             "HOST": os.environ.get("DB_HOST", "localhost"),
             "USER": os.environ.get("DB_USER", "postgres"),
             "PORT": os.environ.get("DB_PORT", 5432),
