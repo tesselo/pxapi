@@ -17,15 +17,22 @@ def wmtsview(request):
     """
     WMTS endpoint with monthly latest pixel layers.
     """
+    # Get auth key.
     key = request.GET.get(GET_QUERY_PARAMETER_AUTH_KEY, None)
+    # Get cloud cover query argument.
     max_cloud_cover_percentage = request.GET.get("max_cloud_cover_percentage", 100)
-    host = request.META.get("HTTP_HOST")
-    xml = wmts.gen(key, host, max_cloud_cover_percentage)
+    # Construct base url for app.
+    host = request.get_host()
+    protocol = "http" if host in ["127.0.0.1:8000", "localhost"] else "https"
+    urlbase = "{}://{}".format(protocol, host)
+    # Generate WMTS xml.
+    xml = wmts.gen(key, urlbase, max_cloud_cover_percentage)
+    # Return xml to user.
     return HttpResponse(xml, content_type="text/xml")
 
 
 @api_view(["GET"])
-def tilesview(request, z, x, y, platform=''):
+def tilesview(request, z, x, y, platform=""):
     """
     TMS tiles endpoint.
     """
