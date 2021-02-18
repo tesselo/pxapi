@@ -20,7 +20,7 @@
           "DB_HOST": "tesselo-production.ce3mi8diupls.eu-west-1.rds.amazonaws.com",
           "DB_USER": "tesselo",
           "DB_NAME": "pxapi_dev",
-          "REQUESTS_CA_BUNDLE": "/var/task/cacert.pem"
+          "REQUESTS_CA_BUNDLE": "/var/task/botocore/cacert.pem"
         },
     },
     "production": {
