@@ -13,12 +13,6 @@
         "memory_size": 768,
         "slim_handler": true,
         "num_retained_versions": 5,
-        "events": [
-          {
-            "function": "apps.batch.tasks.scan_active_tasks",
-            "expression": "rate(5 minutes)"
-          }
-        ],
         "environment_variables": {
           "AWS_REQUEST_PAYER": "requester",
           "AWS_STORAGE_BUCKET_NAME_MEDIA": "pxapi-media-dev",
