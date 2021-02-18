@@ -231,7 +231,7 @@ TILE_LAYER_TEMPLATE = """
 </Layer>
 """
 
-LATEST_PIXEL_URL_TEMPLATE = "{host}tiles/{{TileMatrix}}/{{TileCol}}/{{TileRow}}.png?key={key}&amp;end={end}&amp;max_cloud_cover_percentage={cloud}"
+LATEST_PIXEL_URL_TEMPLATE = "{host}/tiles/{{TileMatrix}}/{{TileCol}}/{{TileRow}}.png?key={key}&amp;end={end}&amp;max_cloud_cover_percentage={cloud}"
 
 
 def gen(key, host, max_cloud_cover_percentage=100):
@@ -258,7 +258,7 @@ def gen(key, host, max_cloud_cover_percentage=100):
             )
 
     return WMTS_BASE_TEMPLATE.format(
-        metadata_url="{}wmts".format(host),
+        metadata_url="{}/wmts".format(host),
         layers=xml,
         mat=TILE_MATRIX_SET_TEMPLATE,
     )
