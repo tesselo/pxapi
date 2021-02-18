@@ -1,13 +1,23 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 from pipeline.views import KerasModelViewSet, PixelsDataViewSet, TrainingDataViewSet
 from rest_framework import routers
+from wmts.views import tilesview, wmtsview
 
 router = routers.DefaultRouter(trailing_slash=False)
 
-router.register(r"trainingdata", TrainingDataViewSet)
-router.register(r"pixelsdata", PixelsDataViewSet)
-router.register(r"kerasmodel", KerasModelViewSet)
+router.register("trainingdata", TrainingDataViewSet)
+router.register("pixelsdata", PixelsDataViewSet)
+router.register("kerasmodel", KerasModelViewSet)
 
 apiurlpatterns = [
-    url(r"^", include(router.urls)),
+    path("", include(router.urls)),
+    path("wmts", wmtsview),
+    path(
+        "tiles/<int:z>/<int:x>/<int:y>.png",
+        tilesview,
+    ),
+    path(
+        "tiles/<str:platform>/<int:z>/<int:x>/<int:y>.png",
+        tilesview,
+    ),
 ]
