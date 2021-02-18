@@ -19,8 +19,10 @@
           "AWS_DEFAULT_REGION": "eu-west-1",
           "DB_HOST": "tesselo-production.ce3mi8diupls.eu-west-1.rds.amazonaws.com",
           "DB_USER": "tesselo",
-          "DB_NAME": "pxapi_dev",
-          "REQUESTS_CA_BUNDLE": "/var/task/botocore/cacert.pem"
+          "DB_NAME_PXAPI": "pxapi_dev",
+          "REQUESTS_CA_BUNDLE": "/var/task/botocore/cacert.pem",
+          "GDAL_DISABLE_READDIR_ON_OPEN": "YES",
+          "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif,.jp2"
         },
     },
     "production": {
