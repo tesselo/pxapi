@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd party apps.
     "rest_framework",
+    "rest_framework.authtoken",
     "guardian",
     "django_s3_storage",
     "drf_spectacular",
@@ -93,7 +94,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "tesselo"),
+            "NAME": os.environ.get("DB_NAME_PXAPI", "tesselo"),
             "HOST": os.environ.get("DB_HOST", "localhost"),
             "USER": os.environ.get("DB_USER", "postgres"),
             "PORT": os.environ.get("DB_PORT", 5432),
@@ -137,6 +138,7 @@ USE_TZ = True
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "tsuser.authentication.QueryKeyAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
