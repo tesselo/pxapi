@@ -1,5 +1,4 @@
 import datetime
-import json
 import uuid
 
 import boto3
@@ -46,17 +45,17 @@ class BatchJob(models.Model):
             # Get job description of first job result.
             job = desc["jobs"][0]
             # Remove container environment, as it may contain secret keys.
-            if (
-                "description" in job
-                and "container" in job["description"]
-                and "environment" in job["description"]["container"]
-            ):
-                del job["description"]["container"]["environment"]
+            if "container" in job and "environment" in job["container"]:
+                del job["container"]["environment"]
             # Store description and status.
-            self.description = json.dumps(job)
+            self.description = job
             self.status = job["status"]
             # Get log stream name of last attempt (there might be multiple attempts.)
-            if len(job["attempts"]):
+            if "container" in job and "logStreamName" in job["container"]:
+                # This is the case during running state.
+                self.log_stream_name = job["container"]["logStreamName"]
+            elif len(job["attempts"]):
+                # This is the case after completion.
                 self.log_stream_name = job["attempts"][0]["container"]["logStreamName"]
             else:
                 self.log_stream_name = ""
