@@ -104,7 +104,7 @@ def tilesview(request, z, x, y, platform=""):
         platforms=platform,
         limit=10,
         clip=False,
-        pool=False,
+        pool=True,
         maxcloud=max_cloud_cover_percentage,
         level=level,
     )
