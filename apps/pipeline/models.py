@@ -149,16 +149,22 @@ class PixelsData(NamedModel):
             # Count number of items in the catalog.
             number_of_items = get_catalog_length(catalog_uri)
             # TODO: Item per job definition.
-            number_of_jobs = 1
+            # Set number of jobs based on catolog length, with maximun ceiling.
+            max_number_jobs = 100
+            item_per_job = 10
+            number_of_jobs = math.ceil(number_of_items / item_per_job)
+            if number_of_jobs > max_number_jobs:
+                number_of_jobs = max_number_jobs
+                item_per_job = math.ceil(number_of_items / number_of_jobs)
             # Compute number of items per job and convert to string because all
             # batch config arguments are required to be str.
-            item_per_job = str(math.ceil(number_of_items / number_of_jobs))
             # Push collection job.
             collect_job = jobs.push(
                 const.COLLECT_PIXELS_FUNCTION,
                 catalog_uri,
                 config_uri,
-                item_per_job,
+                str(item_per_job),
+                array_size=number_of_jobs,
             )
             # Register collection job id and submitted state.
             self.batchjob_collect_pixels.job_id = collect_job[BATCH_JOB_ID_KEY]
