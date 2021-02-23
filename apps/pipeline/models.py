@@ -254,6 +254,10 @@ class KerasModel(NamedModel):
             json.dumps(self.model_fit_arguments),
             name=const.MODEL_FIT_ARGUMENTS_FILE_NAME,
         )
+        self.model_generator_arguments_file = ContentFile(
+            json.dumps(self.model_generator_arguments),
+            name=const.GENERATOR_ARGUMENTS_FILE_NAME,
+        )
         # Pre-create batch jobs.
         if not self.batchjob_train:
             self.batchjob_train = BatchJob.objects.create()
@@ -270,6 +274,9 @@ class KerasModel(NamedModel):
             model_fit_arguments_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.model_fit_arguments_file.name
             )
+            model_fit_arguments_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.model_generator_arguments_file.name
+            )
             # Push cataloging job, with the collection job as dependency.
             train_job = jobs.push(
                 const.TRAIN_MODEL_FUNCTION,
@@ -277,6 +284,7 @@ class KerasModel(NamedModel):
                 model_config_uri,
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
+                generator_arguments,
             )
             # Register job id and submitted state.
             self.batchjob_train.job_id = train_job[BATCH_JOB_ID_KEY]
