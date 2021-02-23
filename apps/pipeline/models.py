@@ -203,7 +203,7 @@ def model_fit_arguments_file_upload_to(instance, filename):
     return f"kerasmodel/{instance.pk}/{const.MODEL_FIT_ARGUMENTS_FILE_NAME}"
 
 
-def model_generator_arguments_file_upload_to(instance, filename):
+def generator_arguments_file_upload_to(instance, filename):
     return f"kerasmodel/{instance.pk}/{const.GENERATOR_ARGUMENTS_FILE_NAME}"
 
 
@@ -227,8 +227,8 @@ class KerasModel(NamedModel):
         upload_to=model_fit_arguments_file_upload_to, null=True, editable=False
     )
     generator_arguments = models.JSONField(default=dict, blank=True)
-    generator_arguments = models.FileField(
-        upload_to=model_generator_arguments_file_upload_to, null=True, editable=False
+    generator_arguments_file = models.FileField(
+        upload_to=generator_arguments_file_upload_to, null=True, editable=False
     )
 
     batchjob_train = models.ForeignKey(
@@ -254,8 +254,8 @@ class KerasModel(NamedModel):
             json.dumps(self.model_fit_arguments),
             name=const.MODEL_FIT_ARGUMENTS_FILE_NAME,
         )
-        self.model_generator_arguments_file = ContentFile(
-            json.dumps(self.model_generator_arguments),
+        self.generator_arguments_file = ContentFile(
+            json.dumps(self.generator_arguments),
             name=const.GENERATOR_ARGUMENTS_FILE_NAME,
         )
         # Pre-create batch jobs.
@@ -274,8 +274,8 @@ class KerasModel(NamedModel):
             model_fit_arguments_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.model_fit_arguments_file.name
             )
-            model_fit_arguments_uri = "s3://{}/{}".format(
-                settings.AWS_S3_BUCKET_NAME, self.model_generator_arguments_file.name
+            generator_arguments_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.generator_arguments_file.name
             )
             # Push cataloging job, with the collection job as dependency.
             train_job = jobs.push(
@@ -284,7 +284,7 @@ class KerasModel(NamedModel):
                 model_config_uri,
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
-                generator_arguments,
+                generator_arguments_uri,
             )
             # Register job id and submitted state.
             self.batchjob_train.job_id = train_job[BATCH_JOB_ID_KEY]

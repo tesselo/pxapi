@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             field=models.FileField(
                 editable=False,
                 null=True,
-                upload_to=pipeline.models.model_generator_arguments_file_upload_to,
+                upload_to=pipeline.models.generator_arguments_file_upload_to,
             ),
         ),
         migrations.AddField(
