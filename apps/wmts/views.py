@@ -6,6 +6,7 @@ import mercantile
 import numpy
 import rasterio
 from django.http import HttpResponse
+from pixels.algebra import colors, parser
 from pixels.mosaic import latest_pixel
 from rest_framework.decorators import api_view
 from tsuser.const import GET_QUERY_PARAMETER_AUTH_KEY
@@ -95,6 +96,9 @@ def tilesview(request, z, x, y, platform=""):
         bands = ["B04", "B03", "B02"]
         scaling = 4000
         level = "L2A"
+    # Obtain bands from request.
+    if "bands" in request.GET:
+        bands = request.GET.get("bands").split(",")
     # Get pixels.
     creation_args, date, stack = latest_pixel(
         geojson,
@@ -108,16 +112,35 @@ def tilesview(request, z, x, y, platform=""):
         maxcloud=max_cloud_cover_percentage,
         level=level,
     )
-    # Convert stack to image array in uint8.
-    img = numpy.array(
-        [255 * (numpy.clip(dat, 0, scaling) / scaling) for dat in stack]
-    ).astype("uint8")
+    if "formula" in request.GET:
+        # Obtain bands from request.
+        bands = request.GET.get("bands").split(",")
+        # Apply formula.
+        formula = request.GET.get("formula")
+        img = parser.evaluate(formula, bands, stack)
+        # Colorize result.
+        colormap = {
+            "continuous": "True",
+            "to": [26, 152, 80],
+            "from": [215, 48, 39],
+            "over": [255, 255, 191],
+            "range": [-1, 1],
+        }
+        img, stats = colors.colorize(img, colormap)
+        count = 4
+        img = img.swapaxes(1, 2).swapaxes(0, 1)
+    else:
+        # Convert stack to image array in uint8.
+        img = numpy.array(
+            [255 * (numpy.clip(dat, 0, scaling) / scaling) for dat in stack]
+        ).astype("uint8")
+        count = 3
     # Prepare PNG output parameters.
     creation_args.update(
         {
             "driver": "PNG",
             "dtype": "uint8",
-            "count": 3,
+            "count": count,
         }
     )
     # Write data to PNG BytesIO buffer.
