@@ -173,6 +173,7 @@ class PixelsData(NamedModel):
             # Construct catalog base url from config url by stripping the config
             # file name from the config uri.
             new_catalog_uri = config_uri.rstrip(const.CONFIG_FILE_NAME)
+            self.new_collection_uri = f"{new_catalog_uri}/data/collection.json"
             logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
@@ -280,7 +281,7 @@ class KerasModel(NamedModel):
             # Push cataloging job, with the collection job as dependency.
             train_job = jobs.push(
                 const.TRAIN_MODEL_FUNCTION,
-                self.pixelsdata.catalog_uri,
+                self.pixelsdata.new_collection_uri,
                 model_config_uri,
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
