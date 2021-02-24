@@ -1,7 +1,6 @@
 import json
 import logging
 import math
-import os
 import uuid
 
 from batch import jobs
@@ -83,6 +82,10 @@ class TrainingData(NamedModel):
             self.batchjob_parse.status = BatchJob.SUBMITTED
             self.batchjob_parse.save()
 
+    @property
+    def catalog_uri(self):
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/trainingdata/{self.id}/{const.TRAINING_DATA_CATALOG_LOCATION}"
+
 
 def pixels_data_json_upload_to(instance, filename):
     return f"pixelsdata/{instance.pk}/{const.CONFIG_FILE_NAME}"
@@ -112,11 +115,8 @@ class PixelsData(NamedModel):
     )
 
     @property
-    def catalog_uri(self):
-        return "s3://{}/{}/stac/catalog.json".format(
-            settings.AWS_S3_BUCKET_NAME,
-            os.path.dirname(self.config_file.name),
-        )
+    def collection_uri(self):
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/pixelsdata/{self.pk}/{const.PIXELS_DATA_COLLECTION_LOCATION}"
 
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
@@ -139,15 +139,11 @@ class PixelsData(NamedModel):
             )
             logger.debug(f"The config uri is {config_uri}.")
             # Get S3 uri for Y catalog file.
-            catalog_uri = "s3://{}/{}/stac/catalog.json".format(
-                settings.AWS_S3_BUCKET_NAME,
-                os.path.dirname(self.trainingdata.zipfile.name),
-            )
-            logger.debug(f"The catalog uri is {catalog_uri}.")
+            logger.debug(f"The catalog uri is {self.trainingdata.catalog_uri}.")
             # TODO: Make sure the catalog exists, i.e. that the previous job
             # has finished. This currently leads to a server error.
             # Count number of items in the catalog.
-            number_of_items = get_catalog_length(catalog_uri)
+            number_of_items = get_catalog_length(self.trainingdata.catalog_uri)
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
             max_number_jobs = 100
@@ -161,7 +157,7 @@ class PixelsData(NamedModel):
             # Push collection job.
             collect_job = jobs.push(
                 const.COLLECT_PIXELS_FUNCTION,
-                catalog_uri,
+                self.trainingdata.catalog_uri,
                 config_uri,
                 str(item_per_job),
                 array_size=number_of_jobs,
@@ -173,7 +169,6 @@ class PixelsData(NamedModel):
             # Construct catalog base url from config url by stripping the config
             # file name from the config uri.
             new_catalog_uri = config_uri.rstrip(const.CONFIG_FILE_NAME)
-            self.new_collection_uri = f"{new_catalog_uri}/data/collection.json"
             logger.debug(f"The new catalog uri is {new_catalog_uri}.")
             # Get zip file path to pass to collection.
             source_path = "s3://{}/{}".format(
@@ -281,7 +276,7 @@ class KerasModel(NamedModel):
             # Push cataloging job, with the collection job as dependency.
             train_job = jobs.push(
                 const.TRAIN_MODEL_FUNCTION,
-                self.pixelsdata.new_collection_uri,
+                self.pixelsdata.collection_uri,
                 model_config_uri,
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
