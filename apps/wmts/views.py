@@ -1,13 +1,15 @@
+from dateutil.relativedelta import relativedelta
 import datetime
 import io
 import os
+from dateutil.parser import parse
 
 import mercantile
 import numpy
 import rasterio
 from django.http import HttpResponse
 from pixels.algebra import colors, parser
-from pixels.mosaic import latest_pixel
+from pixels.mosaic import latest_pixel, composite
 from rest_framework.decorators import api_view
 from tsuser.const import GET_QUERY_PARAMETER_AUTH_KEY
 from wmts import const, wmts
@@ -121,6 +123,22 @@ def tilesview(request, z, x, y, platform=""):
         level=level,
         sensor=sensor,
     )
+    # creation_args, stack = composite(
+    #     geojson,
+    #     start=str((parse(end) - relativedelta(weeks=2)).date()),
+    #     end=end,
+    #     scale=scale,
+    #     bands=bands + ['B08', 'B8A', 'B11', 'B12'],
+    #     limit=10,
+    #     clip=False,
+    #     pool=False,
+    #     maxcloud=max_cloud_cover_percentage,
+    #     shadow_threshold=0,
+    #     light_clouds=True,
+    # )
+    # stack = stack[:3]
+    print(stack.shape)
+
     if "formula" in request.GET:
         # Obtain bands from request.
         bands = request.GET.get("bands").split(",")
