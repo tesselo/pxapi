@@ -281,6 +281,7 @@ class KerasModel(NamedModel):
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
                 generator_arguments_uri,
+                gpu=True,
             )
             # Register job id and submitted state.
             self.batchjob_train.job_id = train_job[BATCH_JOB_ID_KEY]
