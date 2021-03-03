@@ -65,11 +65,15 @@ class BatchJob(models.Model):
         if not self.log_stream_name:
             return {"error": "Log stream name is not specified for this job."}
         client = boto3.client("logs", region_name=settings.AWS_REGION)
-        log_data = client.get_log_events(
-            logGroupName=const.LOG_GROUP_NAME,
-            logStreamName=self.log_stream_name,
-            limit=limit,
-        )
+        try:
+            log_data = client.get_log_events(
+                logGroupName=const.LOG_GROUP_NAME,
+                logStreamName=self.log_stream_name,
+                limit=limit,
+            )
+        except client.exceptions.ResourceNotFoundException:
+            return {"error": "Log stream does not yet exist. Wait for job to start."}
+
         return [
             "{} | {}".format(
                 datetime.datetime.fromtimestamp(dat["timestamp"] / 1000), dat["message"]
