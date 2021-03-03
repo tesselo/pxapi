@@ -380,6 +380,7 @@ class Prediction(NamedModel):
                 self.generator_arguments_uri,
                 str(item_per_job),
                 array_size=number_of_jobs,
+                gpu=True,
             )
             # Register collection job id and submitted state.
             self.batchjob_predict.job_id = predict_job[BATCH_JOB_ID_KEY]
