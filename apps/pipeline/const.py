@@ -17,5 +17,5 @@ MODEL_H5_FILE_NAME = "model.h5"
 GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
 # Prediction section.
 PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
-PREDICTION_FUNCTION = "pixels.stac_training.predict"
-PREDICTION_CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"
+PREDICTION_FUNCTION = "pixels.stac_training.predict_function_batch"
+PREDICTION_CREATE_CATALOG_FUNCTION = "pixels.stac.build_catalog_from_items"

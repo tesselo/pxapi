@@ -324,11 +324,18 @@ class Prediction(NamedModel):
     )
 
     @property
-    def new_catalog_uri(self):
+    def items_uri(self):
         """
-        S3 uri to the location of the new catalog.
+        The S3 uri pointintg to the stac catalog items from the batch job.
         """
-        return f"prediction/{self.pk}/"
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/prediction/{self.pk}/stac"
+
+    @property
+    def generator_arguments_uri(self):
+        """
+        The S3 uri pointing to the generator arguments file.
+        """
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/prediction/{self.pk}/{const.PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME}"
 
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
@@ -346,12 +353,10 @@ class Prediction(NamedModel):
 
         # If media bucket was specified, run job.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
-            # Get S3 uri for pixels config file.
-            generator_arguments_uri = "s3://{}/{}".format(
-                settings.AWS_S3_BUCKET_NAME, self.generator_arguments_file.name
+            # Log uris in debug mode.
+            logger.debug(
+                f"The generator arguments uri is {self.generator_arguments_uri}."
             )
-            logger.debug(f"The generator arguments uri is {generator_arguments_uri}.")
-            # Get S3 uri for Y catalog file.
             logger.debug(f"The collection uri is {self.pixelsdata.collection_uri}.")
             # TODO: Make sure the catalog exists, i.e. that the previous job
             # has finished. This currently leads to a server error.
@@ -372,7 +377,7 @@ class Prediction(NamedModel):
                 const.PREDICTION_FUNCTION,
                 self.kerasmodel.model_uri,
                 self.pixelsdata.collection_uri,
-                generator_arguments_uri,
+                self.generator_arguments_uri,
                 str(item_per_job),
                 array_size=number_of_jobs,
             )
@@ -380,12 +385,13 @@ class Prediction(NamedModel):
             self.batchjob_predict.job_id = predict_job[BATCH_JOB_ID_KEY]
             self.batchjob_predict.status = BatchJob.SUBMITTED
             self.batchjob_predict.save()
-            # Log the new catalog location.
-            logger.debug(f"The new catalog uri is {self.new_catalog_uri}.")
             # Push cataloging job, with the prediction job as dependency.
             catalog_job = jobs.push(
                 const.PREDICTION_CREATE_CATALOG_FUNCTION,
-                self.new_catalog_uri,
+                self.items_uri,
+                "_item.json",
+                self.name,
+                self.description,
                 self.pixelsdata.collection_uri,
                 depends_on=[predict_job[BATCH_JOB_ID_KEY]],
             )
