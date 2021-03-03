@@ -235,6 +235,13 @@ class KerasModel(NamedModel):
         on_delete=models.PROTECT,
     )
 
+    @property
+    def model_uri(self):
+        """
+        S3 uri of stored model in h5 format.
+        """
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{self.pk}/{const.MODEL_H5_FILE_NAME}"
+
     def save(self, *args, **kwargs):
         # Save a copy of the model definition as file for the DB independent
         # batch processing.
@@ -287,3 +294,102 @@ class KerasModel(NamedModel):
             self.batchjob_train.job_id = train_job[BATCH_JOB_ID_KEY]
             self.batchjob_train.status = BatchJob.SUBMITTED
             self.batchjob_train.save()
+
+
+def training_generator_arguments_file_upload_to(instance, filename):
+    return f"prediction/{instance.pk}/{const.PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME}"
+
+
+class Prediction(NamedModel):
+    pixelsdata = models.ForeignKey(PixelsData, on_delete=models.PROTECT)
+    kerasmodel = models.ForeignKey(KerasModel, on_delete=models.PROTECT)
+    generator_arguments = models.JSONField(default=dict, blank=True)
+    generator_arguments_file = models.FileField(
+        upload_to=training_generator_arguments_file_upload_to, null=True, editable=False
+    )
+    batchjob_predict = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+    )
+    batchjob_create_catalog = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+        related_name="prediction_catalog",
+    )
+
+    @property
+    def new_catalog_uri(self):
+        """
+        S3 uri to the location of the new catalog.
+        """
+        return f"prediction/{self.pk}/"
+
+    def save(self, *args, **kwargs):
+        # Save a copy of the config data as file for the DB independent batch
+        # processing.
+        self.generator_arguments_file = ContentFile(
+            json.dumps(self.generator_arguments),
+            name=const.PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME,
+        )
+        # Pre-create batch jobs.
+        if not self.batchjob_predict:
+            self.batchjob_predict = BatchJob.objects.create()
+        if not self.batchjob_create_catalog:
+            self.batchjob_create_catalog = BatchJob.objects.create()
+        super().save(*args, **kwargs)
+
+        # If media bucket was specified, run job.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            # Get S3 uri for pixels config file.
+            generator_arguments_uri = "s3://{}/{}".format(
+                settings.AWS_S3_BUCKET_NAME, self.generator_arguments_file.name
+            )
+            logger.debug(f"The generator arguments uri is {generator_arguments_uri}.")
+            # Get S3 uri for Y catalog file.
+            logger.debug(f"The collection uri is {self.pixelsdata.collection_uri}.")
+            # TODO: Make sure the catalog exists, i.e. that the previous job
+            # has finished. This currently leads to a server error.
+            # Count number of items in the catalog.
+            number_of_items = get_catalog_length(self.pixelsdata.collection_uri)
+            # TODO: Item per job definition.
+            # Set number of jobs based on catolog length, with maximun ceiling.
+            max_number_jobs = 10
+            item_per_job = 10
+            number_of_jobs = math.ceil(number_of_items / item_per_job)
+            if number_of_jobs > max_number_jobs:
+                number_of_jobs = max_number_jobs
+                item_per_job = math.ceil(number_of_items / number_of_jobs)
+            # Compute number of items per job and convert to string because all
+            # batch config arguments are required to be str.
+            # Push prediction job.
+            predict_job = jobs.push(
+                const.PREDICTION_FUNCTION,
+                self.kerasmodel.model_uri,
+                self.pixelsdata.collection_uri,
+                generator_arguments_uri,
+                str(item_per_job),
+                array_size=number_of_jobs,
+            )
+            # Register collection job id and submitted state.
+            self.batchjob_predict.job_id = predict_job[BATCH_JOB_ID_KEY]
+            self.batchjob_predict.status = BatchJob.SUBMITTED
+            self.batchjob_predict.save()
+            # Log the new catalog location.
+            logger.debug(f"The new catalog uri is {self.new_catalog_uri}.")
+            # Push cataloging job, with the prediction job as dependency.
+            catalog_job = jobs.push(
+                const.PREDICTION_CREATE_CATALOG_FUNCTION,
+                self.new_catalog_uri,
+                self.pixelsdata.collection_uri,
+                depends_on=[predict_job[BATCH_JOB_ID_KEY]],
+            )
+            # Register parse job id and submitted state.
+            self.batchjob_create_catalog.job_id = catalog_job[BATCH_JOB_ID_KEY]
+            self.batchjob_create_catalog.status = BatchJob.SUBMITTED
+            self.batchjob_create_catalog.save()

@@ -12,5 +12,10 @@ TRAIN_MODEL_FUNCTION = "pixels.stac_training.train_model_function"
 MODEL_CONFIGURATION_FILE_NAME = "model.json"
 MODEL_COMPILE_ARGUMENTS_FILE_NAME = "compile_arguments.json"
 MODEL_FIT_ARGUMENTS_FILE_NAME = "fit_arguments.json"
-# Generator sections.
+MODEL_H5_FILE_NAME = "model.h5"
+# Training section.
 GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
+# Prediction section.
+PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
+PREDICTION_FUNCTION = "pixels.stac_training.predict"
+PREDICTION_CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"

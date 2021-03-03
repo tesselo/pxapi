@@ -1,5 +1,10 @@
 from django.urls import include, path
-from pipeline.views import KerasModelViewSet, PixelsDataViewSet, TrainingDataViewSet
+from pipeline.views import (
+    KerasModelViewSet,
+    PixelsDataViewSet,
+    PredictionViewSet,
+    TrainingDataViewSet,
+)
 from rest_framework import routers
 from wmts.views import tilesview, wmtsview
 
@@ -8,6 +13,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register("trainingdata", TrainingDataViewSet)
 router.register("pixelsdata", PixelsDataViewSet)
 router.register("kerasmodel", KerasModelViewSet)
+router.register("prediction", PredictionViewSet)
 
 apiurlpatterns = [
     path("", include(router.urls)),

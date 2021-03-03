@@ -1,6 +1,6 @@
 from batch.serializers import BatchJobSerializer
 from django.conf import settings
-from pipeline.models import KerasModel, PixelsData, TrainingData
+from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
 from rest_framework import serializers
 from rest_framework_guardian.serializers import ObjectPermissionsAssignmentMixin
 
@@ -66,3 +66,18 @@ class KerasModelSerializer(TesseloBaseSerializer):
     class Meta:
         model = KerasModel
         fields = "__all__"
+
+
+class PredictionSerializer(TesseloBaseSerializer):
+
+    batchjob_predict = BatchJobSerializer(read_only=True)
+    batchjob_create_catalog = BatchJobSerializer(read_only=True)
+
+    class Meta:
+        model = Prediction
+        fields = "__all__"
+        read_only_fields = [
+            "generator_arguments_file",
+            "batchjob_predict",
+            "batchjob_create_catalog",
+        ]

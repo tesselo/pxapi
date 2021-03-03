@@ -1,11 +1,12 @@
 from batch.const import BATCH_JOB_FINAL_STATUSES
 from botocore.exceptions import NoCredentialsError
 from drf_spectacular.utils import extend_schema, inline_serializer
-from pipeline.models import KerasModel, PixelsData, TrainingData
+from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
 from pipeline.serializers import (
     KerasModelSerializer,
     PixelsDataSerializer,
+    PredictionSerializer,
     TrainingDataSerializer,
 )
 from rest_framework import serializers, viewsets
@@ -143,3 +144,14 @@ class KerasModelViewSet(TesseloApiViewSet):
 
     queryset = KerasModel.objects.all().order_by("pk")
     serializer_class = KerasModelSerializer
+
+
+class PredictionViewSet(TesseloApiViewSet):
+    """
+    Manage model predictions.
+    """
+
+    _job_field_names = ["batchjob_predict", "batchjob_create_catalog"]
+
+    queryset = Prediction.objects.all().order_by("pk")
+    serializer_class = PredictionSerializer
