@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 SECRET_KEY = "8-2x@(1mnf+pz^xy(xt8vfho19l!938o5lei_0l&2sw7=vw)^z"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -94,11 +94,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME_PXAPI", ""),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "USER": os.environ.get("DB_USER", "postgres"),
-            "PORT": os.environ.get("DB_PORT", 5432),
-            "PASSWORD": os.environ.get("DB_PASSWORD", None),
+            "NAME": os.getenv("DB_NAME_PXAPI", ""),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PORT": os.getenv("DB_PORT", 5432),
+            "PASSWORD": os.getenv("DB_PASSWORD", None),
         }
     }
 
@@ -155,17 +155,17 @@ if DEBUG:
     MEDIA_ROOT = os.path.join(BASE_DIR, "local_media")
 else:
     STATIC_URL = "https://{}.s3.amazonaws.com/".format(
-        os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
+        os.getenv("AWS_STORAGE_BUCKET_NAME_MEDIA")
     )
     AWS_REGION = "eu-central-1"
     # Media files.
-    AWS_S3_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME_MEDIA")
+    AWS_S3_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME_MEDIA")
     DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_FILE_OVERWRITE = True
     AWS_S3_GZIP = False
     # Static files.
-    AWS_S3_BUCKET_NAME_STATIC = os.environ.get("AWS_STORAGE_BUCKET_NAME_STATIC")
+    AWS_S3_BUCKET_NAME_STATIC = os.getenv("AWS_STORAGE_BUCKET_NAME_STATIC")
     STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
 
 # Setup logging for django.
