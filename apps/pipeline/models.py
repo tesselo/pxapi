@@ -147,11 +147,16 @@ class PixelsData(NamedModel):
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
             max_number_jobs = 100
-            item_per_job = 2
+            item_per_job = 100
             number_of_jobs = math.ceil(number_of_items / item_per_job)
             if number_of_jobs > max_number_jobs:
                 number_of_jobs = max_number_jobs
                 item_per_job = math.ceil(number_of_items / number_of_jobs)
+            # Prevent array mode if only one job is necessary. By setting the
+            # the value to None, one single job is triggered without the array
+            # capability.
+            if number_of_jobs == 1:
+                number_of_jobs = None
             # Compute number of items per job and convert to string because all
             # batch config arguments are required to be str.
             # Push collection job.
@@ -364,12 +369,17 @@ class Prediction(NamedModel):
             number_of_items = get_catalog_length(self.pixelsdata.collection_uri)
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
-            max_number_jobs = 1
-            item_per_job = 10
+            max_number_jobs = 5
+            item_per_job = 100
             number_of_jobs = math.ceil(number_of_items / item_per_job)
             if number_of_jobs > max_number_jobs:
                 number_of_jobs = max_number_jobs
                 item_per_job = math.ceil(number_of_items / number_of_jobs)
+            # Prevent array mode if only one job is necessary. By setting the
+            # the value to None, one single job is triggered without the array
+            # capability.
+            if number_of_jobs == 1:
+                number_of_jobs = None
             # Compute number of items per job and convert to string because all
             # batch config arguments are required to be str.
             # Push prediction job.
