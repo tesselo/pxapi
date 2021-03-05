@@ -39,7 +39,7 @@ jobs:
       - name: Install deps
         run: pip install -r ./pxapi/requirements.txt
       - name: Test
-        run: python manage.py test tests
+        run: python ./pxapi/manage.py test ./pxapi/tests
 
   deploy:
     name: Deploy
