@@ -37,7 +37,7 @@ jobs:
       - name: Lint with black
         run: black --check --diff pxapi
       - name: Install deps
-        run: pip install -r requirements.txt
+        run: pip install -r ./pxapi/requirements.txt
       - name: Test
         run: python manage.py test tests
 
