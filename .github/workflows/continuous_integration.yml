@@ -2,10 +2,15 @@ name: Lint, test, and deploy PxAPI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  run-tests:
+  test:
+    name: Lint and Test
     runs-on: ubuntu-latest
     steps:
       - name: Install Python 3
@@ -23,8 +28,6 @@ jobs:
           ref: master
           token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
           path: ./pixels
-      - name: show location
-        run: echo $PWD
       - name: Install linters
         run: pip install isort black flake8
       - name: Lint with Flake8
@@ -33,6 +36,32 @@ jobs:
         run: isort --check --diff pxapi
       - name: Lint with black
         run: black --check --diff pxapi
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Test
+        run: python manage.py test tests
+
+  deploy:
+    name: Deploy
+    needs: [test]
+    runs-on: ubuntu-latest
+    if: contains('refs/heads/main', github.ref)
+    steps:
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Checkout pxapi
+        uses: actions/checkout@v2
+        with:
+          path: ./pxapi
+      - name: Checkout pixels
+        uses: actions/checkout@v2
+        with:
+          repository: tesselo/pixels
+          ref: master
+          token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
+          path: ./pixels
       - name: Create virtualenv and install deps
         run: |
           python -m pip install --upgrade pip virtualenv
