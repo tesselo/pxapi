@@ -83,14 +83,7 @@ WSGI_APPLICATION = "pxapi.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-if DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-else:
+if "DB_NAME_PXAPI" in os.environ:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -99,6 +92,13 @@ else:
             "USER": os.getenv("DB_USER", "postgres"),
             "PORT": os.getenv("DB_PORT", 5432),
             "PASSWORD": os.getenv("DB_PASSWORD", None),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
