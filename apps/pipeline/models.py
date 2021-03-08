@@ -157,6 +157,7 @@ class PixelsData(NamedModel):
             # capability.
             if number_of_jobs == 1:
                 number_of_jobs = None
+                item_per_job = number_of_items
             # Compute number of items per job and convert to string because all
             # batch config arguments are required to be str.
             # Push collection job.
@@ -380,6 +381,7 @@ class Prediction(NamedModel):
             # capability.
             if number_of_jobs == 1:
                 number_of_jobs = None
+                item_per_job = number_of_items
             # Compute number of items per job and convert to string because all
             # batch config arguments are required to be str.
             # Push prediction job.
