@@ -1,4 +1,4 @@
-name: Lint, test, and deploy PxAPI
+name: Continuous Integration for PxAPI
 
 on:
   push:
