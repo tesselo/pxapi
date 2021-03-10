@@ -123,7 +123,7 @@ class TrainingDataViewSet(TesseloApiViewSet):
 
     _job_field_names = ["batchjob_parse"]
 
-    queryset = TrainingData.objects.all().order_by("pk")
+    queryset = TrainingData.objects.all().order_by("name")
     serializer_class = TrainingDataSerializer
 
 
@@ -134,7 +134,7 @@ class PixelsDataViewSet(TesseloApiViewSet):
 
     _job_field_names = ["batchjob_collect_pixels", "batchjob_create_catalog"]
 
-    queryset = PixelsData.objects.all().order_by("pk")
+    queryset = PixelsData.objects.all().order_by("name")
     serializer_class = PixelsDataSerializer
 
 
@@ -142,7 +142,7 @@ class KerasModelViewSet(TesseloApiViewSet):
 
     _job_field_names = ["batchjob_train"]
 
-    queryset = KerasModel.objects.all().order_by("pk")
+    queryset = KerasModel.objects.all().order_by("name")
     serializer_class = KerasModelSerializer
 
 
@@ -153,5 +153,5 @@ class PredictionViewSet(TesseloApiViewSet):
 
     _job_field_names = ["batchjob_predict", "batchjob_create_catalog"]
 
-    queryset = Prediction.objects.all().order_by("pk")
+    queryset = Prediction.objects.all().order_by("name")
     serializer_class = PredictionSerializer
