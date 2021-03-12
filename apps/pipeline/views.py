@@ -15,6 +15,7 @@ from pipeline.serializers import (
 from pixels.stac import open_file_from_s3
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_guardian import filters
@@ -28,6 +29,35 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.ObjectPermissionsFilter,)
 
     _job_field_names = []
+
+    def _jobs_are_finished(self, obj):
+        """
+        Check if all jobs are in finished state.
+        """
+        finished = []
+        for field in self._job_field_names:
+            # Get job object.
+            job = getattr(obj, field)
+            # Update job status if necessary.
+            if job.status not in BATCH_JOB_FINAL_STATUSES:
+                job.update()
+            # Check if job is in final status.
+            finished.append(job.status in BATCH_JOB_FINAL_STATUSES)
+        # Check if all jobs have finished.
+        return all(finished)
+
+    def update(self, request, pk):
+        """
+        Only allow updates if the existing jobs have failed or succeeded.
+        """
+        obj = self.get_object()
+        # Ensure all jobs have finished before triggering update.
+        if not self._jobs_are_finished(obj):
+            raise ValidationError(
+                "Updates are only allowed once all existing jobs have finished.",
+            )
+
+        return super().update(request, pk)
 
     @extend_schema(
         responses=inline_serializer(

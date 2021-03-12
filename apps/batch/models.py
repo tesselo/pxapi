@@ -37,7 +37,12 @@ class BatchJob(models.Model):
         return "{} | {}".format(self.job_id, self.status)
 
     def update(self):
+        # Only attempt update if region was specified.
+        if not hasattr(settings, "AWS_REGION"):
+            return
+        # Instantiate batch client.
         batch = boto3.client("batch", region_name=settings.AWS_REGION)
+        # Retrieve job descriptions.
         desc = batch.describe_jobs(jobs=[self.job_id])
         if not len(desc["jobs"]):
             self.status = self.UNKNOWN
