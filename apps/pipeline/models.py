@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
-from pipeline.utils import get_catalog_length
+from pixels.stac import get_catalog_length
 
 logger = logging.getLogger(__name__)
 
