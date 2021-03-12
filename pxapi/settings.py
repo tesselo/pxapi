@@ -149,7 +149,7 @@ REST_FRAMEWORK = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-if DEBUG:
+if DEBUG or not 'AWS_STORAGE_BUCKET_NAME_MEDIA' in os.environ:
     STATIC_ROOT = "/tmp/staticfiles"
     STATIC_URL = "/static/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "local_media")
