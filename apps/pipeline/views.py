@@ -1,5 +1,8 @@
+import json
+
 from batch.const import BATCH_JOB_FINAL_STATUSES
 from botocore.exceptions import NoCredentialsError
+from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
 from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
@@ -9,6 +12,7 @@ from pipeline.serializers import (
     PredictionSerializer,
     TrainingDataSerializer,
 )
+from pixels.stac import open_file_from_s3
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -125,6 +129,39 @@ class TrainingDataViewSet(TesseloApiViewSet):
 
     queryset = TrainingData.objects.all().order_by("name")
     serializer_class = TrainingDataSerializer
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="Catalog",
+            fields={
+                "message": serializers.CharField(),
+                "stac_catalog": serializers.JSONField(),
+            },
+        ),
+    )
+    @action(detail=True, methods=["get"])
+    def catalog(self, request, pk):
+        """
+        Access STAC catalog.
+        """
+        # Get object.
+        obj = self.get_object()
+        # Set data to default None.
+        data = None
+        # If bucket name was specified, use it to get data.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            # Get catalog from S3.
+            data = open_file_from_s3(obj.catalog_uri)
+            # If there was an existing catalog, convert it to dict.
+            if data is not None:
+                data = data["Body"].read()
+                if isinstance(data, bytes):
+                    data = data.decode("utf-8")
+                data = json.loads(data)
+        # Choose message.
+        msg = "No catalog found." if data is None else "Found STAC catalog."
+        # Return data.
+        return Response({"message": msg, "stac_catalog": data})
 
 
 class PixelsDataViewSet(TesseloApiViewSet):

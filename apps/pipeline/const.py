@@ -6,7 +6,6 @@ CONFIG_FILE_NAME = "config.json"
 COLLECT_PIXELS_FUNCTION = "pixels.stac.collect_from_catalog_subsection"
 CREATE_CATALOG_FUNCTION = "pixels.stac.create_x_catalog"
 PIXELS_DATA_COLLECTION_LOCATION = "data/collection.json"
-
 # Keras model section.
 TRAIN_MODEL_FUNCTION = "pixels.stac_training.train_model_function"
 MODEL_CONFIGURATION_FILE_NAME = "model.json"
