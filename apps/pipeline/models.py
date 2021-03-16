@@ -10,6 +10,10 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
+from pipeline.exceptions import (
+    PixelsJobDoesNotExistException,
+    PixelsJobIsRunningException,
+)
 from pixels.stac import get_catalog_length
 
 logger = logging.getLogger(__name__)
@@ -52,12 +56,30 @@ class TrainingData(NamedModel):
         help_text="Background job that creates a STAC catalog from the input data.",
     )
 
+    @property
+    def catalog_uri(self):
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/trainingdata/{self.id}/{const.TRAINING_DATA_CATALOG_LOCATION}"
+
     def save(self, *args, **kwargs):
-        # Pre-create batch job.
-        if not self.batchjob_parse:
+        if self.batchjob_parse:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_parse.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
             self.batchjob_parse = BatchJob.objects.create()
-        # Save object data.
+        # Save model.
         super().save(*args, **kwargs)
+
+    def push(self):
+        """
+        Push training data parse task to batch.
+        """
+        if not self.batchjob_parse:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_parse.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
         # If media bucket was specified, run job.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
             # Get S3 uri for zipfile and other parse variables.
@@ -81,10 +103,6 @@ class TrainingData(NamedModel):
             self.batchjob_parse.job_id = job[BATCH_JOB_ID_KEY]
             self.batchjob_parse.status = BatchJob.SUBMITTED
             self.batchjob_parse.save()
-
-    @property
-    def catalog_uri(self):
-        return f"s3://{settings.AWS_S3_BUCKET_NAME}/trainingdata/{self.id}/{const.TRAINING_DATA_CATALOG_LOCATION}"
 
 
 def pixels_data_json_upload_to(instance, filename):
@@ -119,17 +137,45 @@ class PixelsData(NamedModel):
         return f"s3://{settings.AWS_S3_BUCKET_NAME}/pixelsdata/{self.pk}/{const.PIXELS_DATA_COLLECTION_LOCATION}"
 
     def save(self, *args, **kwargs):
+        if self.batchjob_collect_pixels:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_collect_pixels.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
+            self.batchjob_collect_pixels = BatchJob.objects.create()
+
+        if self.batchjob_create_catalog:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_create_catalog.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
+            self.batchjob_create_catalog = BatchJob.objects.create()
+
         # Save a copy of the config data as file for the DB independent batch
         # processing.
         self.config_file = ContentFile(
             json.dumps(self.config), name=const.CONFIG_FILE_NAME
         )
-        # Pre-create batch jobs.
-        if not self.batchjob_collect_pixels:
-            self.batchjob_collect_pixels = BatchJob.objects.create()
-        if not self.batchjob_create_catalog:
-            self.batchjob_create_catalog = BatchJob.objects.create()
+
         super().save(*args, **kwargs)
+
+    def push(self):
+        """
+        Push pixels collection task to aws batch.
+        """
+        if not self.batchjob_collect_pixels:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_collect_pixels.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
+
+        if not self.batchjob_create_catalog:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_create_catalog.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
 
         # If media bucket was specified, run job.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
@@ -249,6 +295,13 @@ class KerasModel(NamedModel):
         return f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{self.pk}/{const.MODEL_H5_FILE_NAME}"
 
     def save(self, *args, **kwargs):
+        if self.batchjob_train:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_train.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
+            self.batchjob_train = BatchJob.objects.create()
         # Save a copy of the model definition as file for the DB independent
         # batch processing.
         self.model_configuration_file = ContentFile(
@@ -267,10 +320,17 @@ class KerasModel(NamedModel):
             json.dumps(self.generator_arguments),
             name=const.GENERATOR_ARGUMENTS_FILE_NAME,
         )
-        # Pre-create batch jobs.
-        if not self.batchjob_train:
-            self.batchjob_train = BatchJob.objects.create()
         super().save(*args, **kwargs)
+
+    def push(self):
+        """
+        Push training job to batch.
+        """
+        if not self.batchjob_train:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_train.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
         # If media bucket was specified, run job.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
             # Get model definition uris.
@@ -344,18 +404,46 @@ class Prediction(NamedModel):
         return f"s3://{settings.AWS_S3_BUCKET_NAME}/prediction/{self.pk}/{const.PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME}"
 
     def save(self, *args, **kwargs):
+        if self.batchjob_predict:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_predict.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
+            self.batchjob_predict = BatchJob.objects.create()
+
+        if self.batchjob_create_catalog:
+            # Prevent changing objects that have running jobs.
+            if self.batchjob_create_catalog.running:
+                raise PixelsJobIsRunningException()
+        else:
+            # Pre-create batch job if it does not yet exists.
+            self.batchjob_create_catalog = BatchJob.objects.create()
+
         # Save a copy of the config data as file for the DB independent batch
         # processing.
         self.generator_arguments_file = ContentFile(
             json.dumps(self.generator_arguments),
             name=const.PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME,
         )
-        # Pre-create batch jobs.
-        if not self.batchjob_predict:
-            self.batchjob_predict = BatchJob.objects.create()
-        if not self.batchjob_create_catalog:
-            self.batchjob_create_catalog = BatchJob.objects.create()
+
         super().save(*args, **kwargs)
+
+    def push(self):
+        """
+        Push prediction job to batch.
+        """
+        if not self.batchjob_predict:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_predict.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
+
+        if not self.batchjob_create_catalog:
+            raise PixelsJobDoesNotExistException()
+        elif self.batchjob_create_catalog.running:
+            # Prevent triggering duplicated jobs.
+            raise PixelsJobIsRunningException()
 
         # If media bucket was specified, run job.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):

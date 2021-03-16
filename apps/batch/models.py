@@ -2,20 +2,25 @@ import datetime
 import uuid
 
 import boto3
-from batch import const
+from batch.const import (
+    BATCH_JOB_FINAL_STATUSES,
+    BATCH_JOB_RUNNING_STATUSES,
+    FAILED,
+    LOG_GROUP_NAME,
+    PENDING,
+    RUNNABLE,
+    RUNNING,
+    STARTING,
+    SUBMITTED,
+    SUCCEEDED,
+    UNKNOWN,
+)
 from django.conf import settings
 from django.db import models
 
 
 class BatchJob(models.Model):
-    UNKNOWN = "UNKNOWN"
-    SUBMITTED = "SUBMITTED"
-    PENDING = "PENDING"
-    RUNNABLE = "RUNNABLE"
-    STARTING = "STARTING"
-    RUNNING = "RUNNING"
-    SUCCEEDED = "SUCCEEDED"
-    FAILED = "FAILED"
+
     STATUS_CHOICES = (
         (SUBMITTED, SUBMITTED),
         (PENDING, PENDING),
@@ -35,6 +40,12 @@ class BatchJob(models.Model):
 
     def __str__(self):
         return "{} | {}".format(self.job_id, self.status)
+
+    @property
+    def running(self):
+        if self.status not in BATCH_JOB_FINAL_STATUSES:
+            self.update()
+        return self.status in BATCH_JOB_RUNNING_STATUSES
 
     def update(self):
         # Only attempt update if region was specified.
@@ -75,7 +86,7 @@ class BatchJob(models.Model):
         client = boto3.client("logs", region_name=settings.AWS_REGION)
         try:
             log_data = client.get_log_events(
-                logGroupName=const.LOG_GROUP_NAME,
+                logGroupName=LOG_GROUP_NAME,
                 logStreamName=self.log_stream_name,
                 limit=limit,
             )

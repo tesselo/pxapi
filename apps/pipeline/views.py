@@ -1,6 +1,5 @@
 import json
 
-from batch.const import BATCH_JOB_FINAL_STATUSES
 from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
 from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
@@ -35,17 +34,14 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         """
         Check if all jobs are in finished state.
         """
-        finished = []
+        running = []
         for field in self._job_field_names:
             # Get job object.
             job = getattr(obj, field)
-            # Update job status if necessary.
-            if job.status not in BATCH_JOB_FINAL_STATUSES:
-                job.update()
             # Check if job is in final status.
-            finished.append(job.status in BATCH_JOB_FINAL_STATUSES)
+            running.append(job.running)
         # Check if all jobs have finished.
-        return all(finished)
+        return not any(running)
 
     def update(self, request, pk):
         """
