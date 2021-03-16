@@ -1,7 +1,6 @@
 import json
 
 from batch.const import BATCH_JOB_FINAL_STATUSES
-from botocore.exceptions import NoCredentialsError
 from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
 from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
@@ -58,57 +57,6 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
             )
 
         return super().update(request, pk)
-
-    @extend_schema(
-        responses=inline_serializer(
-            name="Refresh",
-            fields={
-                "job_field": serializers.CharField(),
-                "message": serializers.CharField(),
-            },
-        ),
-    )
-    @action(detail=True, methods=["get"])
-    def refresh(self, request, pk):
-        """
-        Update batch job statuses.
-        """
-        # Get parent object.
-        obj = self.get_object()
-        messages = []
-        for field in self._job_field_names:
-            # Get job object.
-            job = getattr(obj, field)
-            # Make sanity checks.
-            if not job:
-                msg = {"job_field": field, "message": "No job object found."}
-            elif not job.job_id:
-                msg = {"job_field": field, "message": "No job id found."}
-            elif job.status in BATCH_JOB_FINAL_STATUSES:
-                msg = {
-                    "job_field": field,
-                    "message": "Nothing to do, job was already in final status {}.".format(
-                        job.status
-                    ),
-                }
-            else:
-                try:
-                    # Update job status.
-                    job.update()
-                    msg = {
-                        "job_id": job.job_id,
-                        "message": 'Updated batch job. New status is "{}".'.format(
-                            job.status
-                        ),
-                    }
-                except NoCredentialsError:
-                    msg = {
-                        "job_id": job.job_id,
-                        "message": "Could not retrieve job details - no credentials found.",
-                    }
-            messages.append(msg)
-        # Send job update messages.
-        return Response(messages)
 
     @extend_schema(
         responses=inline_serializer(
