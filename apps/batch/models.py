@@ -59,7 +59,10 @@ class BatchJob(models.Model):
         # Retrieve job descriptions.
         desc = batch.describe_jobs(jobs=[self.job_id])
         if not len(desc["jobs"]):
-            self.status = self.UNKNOWN
+            # If status is already unknown, return early.
+            if self.status == UNKNOWN:
+                return
+            self.status = UNKNOWN
         else:
             # Get job description of first job result.
             job = desc["jobs"][0]
