@@ -40,6 +40,9 @@ class BatchJob(models.Model):
         # Only attempt update if region was specified.
         if not hasattr(settings, "AWS_REGION"):
             return
+        # Only attempt update if job id exists.
+        if not self.job_id:
+            return
         # Instantiate batch client.
         batch = boto3.client("batch", region_name=settings.AWS_REGION)
         # Retrieve job descriptions.
