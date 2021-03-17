@@ -15,6 +15,7 @@ from pixels.stac import open_file_from_s3
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_guardian import filters
@@ -25,7 +26,8 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         TesseloBaseObjectPermissions,
     )
-    filter_backends = (filters.ObjectPermissionsFilter,)
+    filter_backends = (filters.ObjectPermissionsFilter, SearchFilter)
+    search_fields = ("name",)
 
     _job_field_names = []
 
