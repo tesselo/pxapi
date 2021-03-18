@@ -3,6 +3,7 @@ import json
 from batch.const import BATCH_JOB_FINAL_STATUSES
 from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
+from pipeline.exceptions import UpdateBeforeFinishedExeption
 from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
 from pipeline.permissions import TesseloBaseObjectPermissions
 from pipeline.serializers import (
@@ -14,7 +15,6 @@ from pipeline.serializers import (
 from pixels.stac import open_file_from_s3
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -47,18 +47,16 @@ class TesseloApiViewSet(viewsets.ModelViewSet):
         # Check if all jobs have finished.
         return all(finished)
 
-    def update(self, request, pk):
+    def update(self, request, pk, *args, **kwargs):
         """
         Only allow updates if the existing jobs have failed or succeeded.
         """
         obj = self.get_object()
         # Ensure all jobs have finished before triggering update.
         if not self._jobs_are_finished(obj):
-            raise ValidationError(
-                "Updates are only allowed once all existing jobs have finished.",
-            )
+            raise UpdateBeforeFinishedExeption()
 
-        return super().update(request, pk)
+        return super().update(request, pk, *args, **kwargs)
 
     @extend_schema(
         responses=inline_serializer(

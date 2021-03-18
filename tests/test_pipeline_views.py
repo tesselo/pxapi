@@ -1,6 +1,7 @@
 import tempfile
 import zipfile
 
+from batch.models import BatchJob
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -33,3 +34,30 @@ class PipelineViewTests(TestCase):
         self.assertEqual(response["name"], "Bananastand")
         self.assertEqual(response["batchjob_parse"]["status"], "UNKNOWN")
         self.assertEqual(response["reference_date"], "2021-01-01")
+        # Check immutability if not finished.
+        data_id = response["id"]
+        update_url = reverse("trainingdata-detail", kwargs={"pk": data_id})
+        response = self.client.patch(
+            update_url,
+            data={
+                "id": data_id,
+                "name": "New Bananastand",
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.json(),
+            {"detail": "Updates are not allowed until batch jobs have finished."},
+        )
+        # Check that once finished, data can be updated.
+        BatchJob.objects.all().update(status=BatchJob.SUCCEEDED)
+        response = self.client.patch(
+            update_url,
+            data={
+                "name": "New Bananastand",
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["name"], "New Bananastand")
