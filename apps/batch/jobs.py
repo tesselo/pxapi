@@ -54,13 +54,19 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         # For GPU at the moment fix one specific size.
         job["containerOverrides"].update(
             {
-                "vcpus": 8,
-                "memory": int(1024 * 30.5),
                 "resourceRequirements": [
                     {
                         "type": "GPU",
                         "value": "1",
-                    }
+                    },
+                    {
+                        "type": "MEMORY",
+                        "value": str(int(1024 * 30.5)),
+                    },
+                    {
+                        "type": "VCPU",
+                        "value": "8",
+                    },
                 ],
             }
         )
