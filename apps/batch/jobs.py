@@ -75,8 +75,16 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         # the step size of EC2 instances.
         job["containerOverrides"].update(
             {
-                "vcpus": cpu,
-                "memory": 1024 * cpu,
+                "resourceRequirements": [
+                    {
+                        "type": "MEMORY",
+                        "value": str(1024 * cpu),
+                    },
+                    {
+                        "type": "VCPU",
+                        "value": str(cpu),
+                    },
+                ],
             }
         )
     # Set job dependency.
