@@ -32,13 +32,14 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         A list of batch job IDs from which the new job depends. If specified,
         the new job will only be executed if the dependencies were successful.
     """
+    job_queue = "fetch-and-run-queue-gpu" if gpu else "fetch-and-run-queue"
     # Create job dict, inserting job name and command to execute.
     job = {
         "jobName": "{}-{}".format(
             funk.replace(".", "-"),
             datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         ),
-        "jobQueue": "fetch-and-run-queue",
+        "jobQueue": job_queue,
         "jobDefinition": "first-run-job-definition",
         "containerOverrides": {
             "command": ["runpixels.py", funk, *args],
