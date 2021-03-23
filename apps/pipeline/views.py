@@ -12,7 +12,7 @@ from pipeline.serializers import (
     PredictionSerializer,
     TrainingDataSerializer,
 )
-from pixels.stac import open_file_from_s3
+from pixels.stac import stac_s3_read_method
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -128,14 +128,7 @@ class TrainingDataViewSet(TesseloApiViewSet):
         data = None
         # If bucket name was specified, use it to get data.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
-            # Get catalog from S3.
-            data = open_file_from_s3(obj.catalog_uri)
-            # If there was an existing catalog, convert it to dict.
-            if data is not None:
-                data = data["Body"].read()
-                if isinstance(data, bytes):
-                    data = data.decode("utf-8")
-                data = json.loads(data)
+            data = json.loads(stac_s3_read_method(obj.catalog_uri))
         # Choose message.
         msg = "No catalog found." if data is None else "Found STAC catalog."
         # Return data.
@@ -159,6 +152,31 @@ class KerasModelViewSet(TesseloApiViewSet):
 
     queryset = KerasModel.objects.all().order_by("name")
     serializer_class = KerasModelSerializer
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="Catalog",
+            fields={
+                "message": serializers.CharField(),
+                "stac_catalog": serializers.JSONField(),
+            },
+        ),
+    )
+    @action(detail=True, methods=["get"])
+    def history(self, request, pk, format=None):
+        """
+        Access STAC catalog.
+        """
+        # Set data to default None.
+        data = None
+        # If bucket name was specified, use it to get data.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history.json"
+            data = json.loads(stac_s3_read_method(uri))
+        # Choose message.
+        msg = "No history found." if data is None else "Found history."
+        # Return data.
+        return Response({"message": msg, "stac_catalog": data})
 
 
 class PredictionViewSet(TesseloApiViewSet):
