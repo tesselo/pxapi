@@ -171,7 +171,7 @@ class KerasModelViewSet(TesseloApiViewSet):
         data = None
         # If bucket name was specified, use it to get data.
         if hasattr(settings, "AWS_S3_BUCKET_NAME"):
-            uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history.json"
+            uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history_stats.json"
             data = json.loads(stac_s3_read_method(uri))
         # Choose message.
         msg = "No history found." if data is None else "Found history."
