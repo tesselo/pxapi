@@ -158,7 +158,7 @@ class KerasModelViewSet(TesseloApiViewSet):
             name="Catalog",
             fields={
                 "message": serializers.CharField(),
-                "stac_catalog": serializers.JSONField(),
+                "history": serializers.JSONField(),
             },
         ),
     )
@@ -176,7 +176,7 @@ class KerasModelViewSet(TesseloApiViewSet):
         # Choose message.
         msg = "No history found." if data is None else "Found history."
         # Return data.
-        return Response({"message": msg, "stac_catalog": data})
+        return Response({"message": msg, "history": data})
 
 
 class PredictionViewSet(TesseloApiViewSet):
