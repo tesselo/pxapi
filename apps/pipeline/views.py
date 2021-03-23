@@ -118,7 +118,7 @@ class TrainingDataViewSet(TesseloApiViewSet):
         ),
     )
     @action(detail=True, methods=["get"])
-    def catalog(self, request, pk):
+    def catalog(self, request, pk, format=None):
         """
         Access STAC catalog.
         """
