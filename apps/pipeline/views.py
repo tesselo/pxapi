@@ -145,6 +145,32 @@ class PixelsDataViewSet(TesseloApiViewSet):
     queryset = PixelsData.objects.all().order_by("name")
     serializer_class = PixelsDataSerializer
 
+    @extend_schema(
+        responses=inline_serializer(
+            name="Collection",
+            fields={
+                "message": serializers.CharField(),
+                "stac_collection": serializers.JSONField(),
+            },
+        ),
+    )
+    @action(detail=True, methods=["get"])
+    def collection(self, request, pk, format=None):
+        """
+        Access STAC catalog.
+        """
+        # Get object.
+        obj = self.get_object()
+        # Set data to default None.
+        data = None
+        # If bucket name was specified, use it to get data.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            data = json.loads(stac_s3_read_method(obj.collection_uri))
+        # Choose message.
+        msg = "No collection found." if data is None else "Found STAC collection."
+        # Return data.
+        return Response({"message": msg, "stac_collection": data})
+
 
 class KerasModelViewSet(TesseloApiViewSet):
 
