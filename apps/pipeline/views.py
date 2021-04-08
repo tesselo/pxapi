@@ -181,7 +181,7 @@ class KerasModelViewSet(TesseloApiViewSet):
 
     @extend_schema(
         responses=inline_serializer(
-            name="Catalog",
+            name="History",
             fields={
                 "message": serializers.CharField(),
                 "history": serializers.JSONField(),
@@ -191,7 +191,7 @@ class KerasModelViewSet(TesseloApiViewSet):
     @action(detail=True, methods=["get"])
     def history(self, request, pk, format=None):
         """
-        Access STAC catalog.
+        Access model training history.
         """
         # Set data to default None.
         data = None
@@ -205,6 +205,31 @@ class KerasModelViewSet(TesseloApiViewSet):
         msg = "No history found." if data is None else "Found history."
         # Return data.
         return Response({"message": msg, "history": data})
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="Evaluation",
+            fields={
+                "message": serializers.CharField(),
+                "evaluation": serializers.JSONField(),
+            },
+        ),
+    )
+    @action(detail=True, methods=["get"])
+    def evaluation(self, request, pk, format=None):
+        """
+        Access model evaluation statistics.
+        """
+        # Set data to default None.
+        data = None
+        # If bucket name was specified, use it to get data.
+        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+            uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/evaluation_stats.json"
+            data = json.loads(stac_s3_read_method(uri))
+        # Choose message.
+        msg = "No evaluation found." if data is None else "Found evaluation."
+        # Return data.
+        return Response({"message": msg, "evaluation": data})
 
 
 class PredictionViewSet(TesseloApiViewSet):
