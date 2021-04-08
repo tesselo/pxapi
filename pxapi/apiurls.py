@@ -18,6 +18,7 @@ router.register("prediction", PredictionViewSet)
 apiurlpatterns = [
     path("", include(router.urls)),
     path("wmts", wmtsview),
+    path("wmts/<str:platform>", wmtsview),
     path(
         "tiles/<int:z>/<int:x>/<int:y>.png",
         tilesview,

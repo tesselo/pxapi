@@ -231,9 +231,10 @@ TILE_LAYER_TEMPLATE = """
 """
 
 LATEST_PIXEL_URL_TEMPLATE = "{host}/tiles/{{TileMatrix}}/{{TileCol}}/{{TileRow}}.png?key={key}&amp;end={end}&amp;max_cloud_cover_percentage={cloud}"
+LATEST_PIXEL_PLATFORM_URL_TEMPLATE = "{host}/tiles/{platform}/{{TileMatrix}}/{{TileCol}}/{{TileRow}}.png?key={key}&amp;end={end}&amp;max_cloud_cover_percentage={cloud}"
 
 
-def gen(key, host, max_cloud_cover_percentage=100):
+def gen(key, host, max_cloud_cover_percentage=100, platform=None):
     """
     Generate WMTS xml string.
     """
@@ -243,13 +244,23 @@ def gen(key, host, max_cloud_cover_percentage=100):
             end = datetime.date(year=year, month=month, day=1)
             if end > datetime.datetime.now().date():
                 break
-            title = "Latest Pixel " + end.strftime("%B %Y")
-            url = LATEST_PIXEL_URL_TEMPLATE.format(
-                host=host,
-                key=key,
-                end=end,
-                cloud=max_cloud_cover_percentage,
-            )
+            if platform:
+                title = f"Latest Pixel {platform.title()} {end.strftime('%Y %B')}"
+                url = LATEST_PIXEL_PLATFORM_URL_TEMPLATE.format(
+                    host=host,
+                    key=key,
+                    end=end,
+                    cloud=max_cloud_cover_percentage,
+                    platform=platform,
+                )
+            else:
+                title = "Latest Pixel " + end.strftime("%B %Y")
+                url = LATEST_PIXEL_URL_TEMPLATE.format(
+                    host=host,
+                    key=key,
+                    end=end,
+                    cloud=max_cloud_cover_percentage,
+                )
             xml += TILE_LAYER_TEMPLATE.format(
                 title=title,
                 identifier=end.strftime("%Y%m"),

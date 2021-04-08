@@ -14,7 +14,7 @@ from wmts import const, wmts
 
 
 @api_view(["GET"])
-def wmtsview(request):
+def wmtsview(request, platform=""):
     """
     WMTS endpoint with monthly latest pixel layers.
     """
@@ -27,7 +27,7 @@ def wmtsview(request):
     protocol = "http" if host in ["127.0.0.1:8000", "localhost"] else "https"
     urlbase = "{}://{}".format(protocol, host)
     # Generate WMTS xml.
-    xml = wmts.gen(key, urlbase, max_cloud_cover_percentage)
+    xml = wmts.gen(key, urlbase, max_cloud_cover_percentage, platform)
     # Return xml to user.
     return HttpResponse(xml, content_type="text/xml")
 
@@ -74,20 +74,24 @@ def tilesview(request, z, x, y, platform=""):
         ],
     }
     # Specify the platform to use.
-    platform = platform.upper()
+    platform = platform.upper().replace("-", "_")
     level = None
     if platform == "LANDSAT_4":
         bands = ["B3", "B2", "B1"]
         scaling = 255
-    elif platform == "LANDSAT_5" or end < "2000-01-01":
+    elif platform == "LANDSAT_5":
+        platform = ["LANDSAT_5"]
+        bands = ["B3", "B2", "B1"]
+        scaling = 255
+    elif platform is None and end < "2000-01-01":
         platform = ["LANDSAT_4", "LANDSAT_5"]
         bands = ["B3", "B2", "B1"]
         scaling = 255
-    elif platform == "LANDSAT_7" or end < "2014-01-01":
+    elif platform == "LANDSAT_7" or (platform is None and end < "2014-01-01"):
         platform = ["LANDSAT_7"]
         bands = ["B3", "B2", "B1"]
         scaling = 255
-    elif platform == "LANDSAT_8" or end < "2018-01-01":
+    elif platform == "LANDSAT_8" or (platform is None and end < "2018-01-01"):
         platform = ["LANDSAT_8"]
         bands = ["B4", "B3", "B2"]
         scaling = 30000
