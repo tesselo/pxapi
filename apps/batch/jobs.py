@@ -33,7 +33,10 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         the new job will only be executed if the dependencies were successful.
     """
     job_queue = "fetch-and-run-queue-gpu" if gpu else "fetch-and-run-queue"
-    # Create job dict, inserting job name and command to execute.
+    # Create job dict, inserting job name and command to execute. The retry
+    # strategy ensures that jobs that are terminated due to spot instance
+    # reclaims are automatically restarted up to five times.
+    # Ref: https://aws.amazon.com/blogs/compute/introducing-retry-strategies-for-aws-batch/
     job = {
         "jobName": "{}-{}".format(
             funk.replace(".", "-"),
@@ -43,6 +46,13 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         "jobDefinition": "first-run-job-definition",
         "containerOverrides": {
             "command": ["runpixels.py", funk, *args],
+        },
+        "retryStrategy": {
+            "attempts": 5,
+            "evaluateOnExit": [
+                {"onStatusReason": "Host EC2*", "action": "RETRY"},
+                {"onReason": "*", "action": "EXIT"},
+            ],
         },
     }
 
