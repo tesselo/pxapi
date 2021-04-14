@@ -76,17 +76,21 @@ def tilesview(request, z, x, y, platform=""):
     # Specify the platform to use.
     platform = platform.upper().replace("-", "_")
     level = None
+    sensor = None
     if platform == "LANDSAT_4":
         bands = ["B3", "B2", "B1"]
-        scaling = 255
+        scaling = 100
+        sensor = "TM"
     elif platform == "LANDSAT_5":
         platform = ["LANDSAT_5"]
         bands = ["B3", "B2", "B1"]
-        scaling = 255
+        scaling = 100
+        sensor = "TM"
     elif platform is None and end < "2000-01-01":
         platform = ["LANDSAT_4", "LANDSAT_5"]
         bands = ["B3", "B2", "B1"]
-        scaling = 255
+        scaling = 100
+        sensor = "TM"
     elif platform == "LANDSAT_7" or (platform is None and end < "2014-01-01"):
         platform = ["LANDSAT_7"]
         bands = ["B3", "B2", "B1"]
@@ -115,6 +119,7 @@ def tilesview(request, z, x, y, platform=""):
         pool=True,
         maxcloud=max_cloud_cover_percentage,
         level=level,
+        sensor=sensor,
     )
     if "formula" in request.GET:
         # Obtain bands from request.
