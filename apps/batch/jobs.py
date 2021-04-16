@@ -72,11 +72,11 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
                     },
                     {
                         "type": "MEMORY",
-                        "value": str(int(1024 * 30.5)),
+                        "value": str(int(1024 * 15)),
                     },
                     {
                         "type": "VCPU",
-                        "value": "8",
+                        "value": "4",
                     },
                 ],
             }

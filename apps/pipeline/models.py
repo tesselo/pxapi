@@ -370,8 +370,8 @@ class Prediction(NamedModel):
             number_of_items = get_catalog_length(self.pixelsdata.collection_uri)
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
-            max_number_jobs = 20
-            item_per_job = 100
+            max_number_jobs = 100
+            item_per_job = 10
             number_of_jobs = math.ceil(number_of_items / item_per_job)
             if number_of_jobs > max_number_jobs:
                 number_of_jobs = max_number_jobs
