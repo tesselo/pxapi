@@ -239,9 +239,11 @@ def gen(key, host, max_cloud_cover_percentage=100, platform=None):
     Generate WMTS xml string.
     """
     xml = ""
-    for year in range(1980, 2021):
+    current_year = datetime.date.today().year + 1
+    for year in range(1980, current_year):
         for month in range(1, 13):
             end = datetime.date(year=year, month=month, day=1)
+            print(end)
             if end > datetime.datetime.now().date():
                 break
             if platform:
