@@ -1,5 +1,5 @@
 # pxapi
-Pixels API
+Pixels API based on Django.
 
 ## Install pixels.
 ```
