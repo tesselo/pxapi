@@ -1,0 +1,16 @@
+Django==3.1.6
+django-filter==2.4.0
+django-s3-storage==0.13.4
+djangorestframework==3.12.2
+djangorestframework-guardian==0.3.0
+drf-spectacular==0.13.2
+Markdown==3.3.3
+boto3==1.17.1
+PyYAML==5.4.1
+uritemplate==3.0.1
+psycopg2-binary==2.8.6
+sat-stac==0.4.0
+pystac==0.5.4
+rasterio==1.2.0
+mercantile==1.1.6
+zappa==0.52.0
