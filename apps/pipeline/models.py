@@ -19,7 +19,7 @@ class NamedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250, help_text="Short name of the object.")
     description = models.TextField(
-        default="", blank=True, help_text='Detailed description of the object."
+        default="", blank=True, help_text='Detailed description of the object.'
     )
 
     class Meta:
