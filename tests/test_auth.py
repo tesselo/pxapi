@@ -21,4 +21,4 @@ class ApiAuthViewTests(TestCase):
             login_url, data={"username": "michael", "password": "bananastand"}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(Token.objects.filter(user=self.usr).exists())
+        self.assertFalse(Token.objects.filter(user=self.usr).exists())
