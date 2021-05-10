@@ -9,8 +9,30 @@ on:
       - main
 
 jobs:
+  static_checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: pip install black flake8
+      - name: Run black and flake
+        uses: wearerequired/lint-action@v1
+        with:
+          black: true
+          flake8: true
+      - name: Run isort
+        uses: jamescurtin/isort-action@master
+        with:
+          requirementsFiles: "requirements.txt dev_requirements.txt"
+
   test:
-    name: Lint and Test
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - name: Install Python 3
@@ -28,14 +50,6 @@ jobs:
           ref: main
           token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
           path: ./pixels
-      - name: Install linters
-        run: pip install isort black flake8
-      - name: Lint with Flake8
-        run: cd ./pxapi && flake8 pxapi
-      - name: Lint with isort
-        run: isort --check --diff pxapi
-      - name: Lint with black
-        run: black --check --diff pxapi
       - name: Install deps
         run: |
           pip install ./pixels
@@ -45,7 +59,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [test]
+    needs: [static_checks, test]
     runs-on: ubuntu-latest
     if: contains('refs/heads/main', github.ref)
     steps:
