@@ -23,8 +23,9 @@
           "DB_NAME_PXAPI": "pxapi_dev",
           "REQUESTS_CA_BUNDLE": "/var/task/botocore/cacert.pem",
           "GDAL_DISABLE_READDIR_ON_OPEN": "YES",
-          "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif,.jp2"
-        },
+          "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif,.jp2",
+          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696"
+        }
     },
     "production": {
       "log_level": "WARNING",
