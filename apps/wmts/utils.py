@@ -1,5 +1,6 @@
 import numpy
 import rasterio
+import sentry_sdk
 from pixels import algebra, const
 from pixels.exceptions import PixelsFailed
 
@@ -73,7 +74,8 @@ def get_s2_rgb_pixels(projectid, z, x, y):
             blue = rst.read(1)
         mask = numpy.all((red != 0, blue != 0, green != 0), axis=0).T * 255
         return red, green, blue, mask
-    except rasterio.errors.RasterioIOError:
+    except rasterio.errors.RasterioIOError as e:
+        sentry_sdk.capture_exception(e)
         return
 
 
@@ -92,7 +94,8 @@ def get_s1_rgb_pixels(projectid, z, x, y):
             )
         ) as rst:
             green = rst.read(1)
-    except rasterio.errors.RasterioIOError:
+    except rasterio.errors.RasterioIOError as e1:
+        sentry_sdk.capture_exception(e1)
         try:
             with rasterio.open(
                 "zip+s3://{}/{}/tiles/{}/{}/{}/pixels.zip!HH.tif".format(
@@ -106,7 +109,8 @@ def get_s1_rgb_pixels(projectid, z, x, y):
                 )
             ) as rst:
                 green = rst.read(1)
-        except:
+        except Exception as e2:
+            sentry_sdk.capture_exception(e2)
             return
 
     mask = numpy.all((red != 0, green != 0), axis=0).T * 255
@@ -138,7 +142,8 @@ def get_s2_formula_pixels(
                     )
                 ) as rst:
                     data[band] = rst.read(1).T.astype("float")
-            except rasterio.errors.RasterioIOError:
+            except rasterio.errors.RasterioIOError as e:
+                sentry_sdk.capture_exception(e)
                 return
 
     index = parser.evaluate(data, formula)

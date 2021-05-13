@@ -20,7 +20,7 @@ boto3==1.17.1
     #   django-s3-storage
     #   kappa
     #   zappa
-botocore==1.20.68
+botocore==1.20.71
     # via
     #   boto3
     #   s3transfer
@@ -28,6 +28,7 @@ certifi==2020.12.5
     # via
     #   rasterio
     #   requests
+    #   sentry-sdk
 cfn-flip==1.2.3
     # via troposphere
 chardet==4.0.0
@@ -92,7 +93,7 @@ markdown==3.3.3
     # via -r requirements.in
 mercantile==1.1.6
     # via -r requirements.in
-numpy==1.20.2
+numpy==1.20.3
     # via
     #   rasterio
     #   snuggs
@@ -137,6 +138,8 @@ s3transfer==0.3.7
     # via boto3
 sat-stac==0.4.0
     # via -r requirements.in
+sentry-sdk==1.1.0
+    # via -r requirements.in
 six==1.16.0
     # via
     #   cfn-flip
@@ -165,6 +168,7 @@ urllib3==1.26.4
     # via
     #   botocore
     #   requests
+    #   sentry-sdk
 werkzeug==0.16.1
     # via zappa
 wheel==0.36.2
