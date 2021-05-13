@@ -38,6 +38,10 @@ class TrainingData(NamedModel):
         upload_to=training_data_zip_upload_to,
         help_text="A zip file containing the training data.",
     )
+    categorical = models.BooleanField(
+        default=True,
+        help_text="Determines if the training data is categorical or continuous.",
+    )
     reference_date = models.DateField(
         null=True,
         blank=True,
@@ -73,6 +77,7 @@ class TrainingData(NamedModel):
             job = jobs.push(
                 const.TRAINING_DATA_PARSE_FUNCTION,
                 uri,
+                self.categorical,
                 save_files,
                 description,
                 reference_date,
