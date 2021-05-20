@@ -11,8 +11,9 @@ mercantile==1.1.6
 psycopg2-binary==2.8.6
 pystac==0.5.4
 PyYAML==5.4.1
-rasterio==1.2.0
+rasterio==1.2.3
 sat-stac==0.4.0
 sentry-sdk
 uritemplate==3.0.1
 zappa==0.52.0
+git+ssh://git@github.com/tesselo/pixels.git@2b7f7dde291008ef3529dcda51226cad9ccf6a8e#egg=pixels
