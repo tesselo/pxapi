@@ -29,11 +29,17 @@ jobs:
         run: isort --check --diff pxapi
       - name: Lint with black
         run: black --check --diff pxapi
+      - name: Setup SSH keys
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Install deps
         run: |
           pip install -r ./pxapi/requirements.txt
         env:
-          GITHUB_PASS: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Test
         run: python ./pxapi/manage.py test ./pxapi/tests
 
@@ -51,6 +57,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ./pxapi
+      - name: Setup SSH keys
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Create virtualenv and install deps
         run: |
           python -m pip install --upgrade pip virtualenv
@@ -59,7 +71,7 @@ jobs:
           pip install ./pixels
           pip install -r ./pxapi/requirements.txt
         env:
-          GITHUB_PASS: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Deploy
         run: |
           source ./pxapi-venv/bin/activate
