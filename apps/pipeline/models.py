@@ -1,8 +1,8 @@
 import json
-import logging
 import math
 import uuid
 
+import structlog
 from batch import jobs
 from batch.const import BATCH_JOB_ID_KEY
 from batch.models import BatchJob
@@ -12,7 +12,7 @@ from django.db import models
 from pipeline import const
 from pixels.stac import get_catalog_length
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class NamedModel(models.Model):

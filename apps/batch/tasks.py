@@ -1,8 +1,7 @@
-import logging
-
+import structlog
 from batch.models import BatchJob
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 def scan_active_tasks():

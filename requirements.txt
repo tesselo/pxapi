@@ -20,7 +20,7 @@ boto3==1.17.1
     #   django-s3-storage
     #   kappa
     #   zappa
-botocore==1.20.71
+botocore==1.20.75
     # via
     #   boto3
     #   s3transfer
@@ -50,7 +50,11 @@ django-filter==2.4.0
     # via -r requirements.in
 django-guardian==2.3.0
     # via djangorestframework-guardian
+django-ipware==3.0.2
+    # via django-structlog
 django-s3-storage==0.13.4
+    # via -r requirements.in
+django-structlog==2.1.0
     # via -r requirements.in
 django==3.1.6
     # via
@@ -58,6 +62,7 @@ django==3.1.6
     #   django-filter
     #   django-guardian
     #   django-s3-storage
+    #   django-structlog
     #   djangorestframework
     #   djangorestframework-guardian
     #   drf-spectacular
@@ -150,6 +155,8 @@ snuggs==1.4.7
     # via rasterio
 sqlparse==0.4.1
     # via django
+structlog==21.1.0
+    # via django-structlog
 text-unidecode==1.3
     # via python-slugify
 toml==0.10.2
