@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: tesselo/pixels
-          ref: main
+          ref: 2b7f7dde291008ef3529dcda51226cad9ccf6a8e
           token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
           path: ./pixels
       - name: Install linters
@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: tesselo/pixels
-          ref: main
+          ref: 2b7f7dde291008ef3529dcda51226cad9ccf6a8e
           token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
           path: ./pixels
       - name: Create virtualenv and install deps

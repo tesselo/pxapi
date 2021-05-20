@@ -2,7 +2,7 @@
 
 install:
 	pip install -r requirements.txt
-	pip install -U git+ssh://git@github.com/tesselo/pixels.git --force-reinstall --no-deps
+	pip install -U "git+ssh://git@github.com/tesselo/pixels.git@2b7f7dde291008ef3529dcda51226cad9ccf6a8e#egg:pixels" --force-reinstall --no-deps
 
 dev_install: install
 	pip install -r dev_requirements.txt
