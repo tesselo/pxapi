@@ -16,4 +16,7 @@ sat-stac==0.4.0
 sentry-sdk
 uritemplate==3.0.1
 zappa==0.52.0
-git+ssh://git@github.com/tesselo/pixels.git@2b7f7dde291008ef3529dcda51226cad9ccf6a8e#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@ef49b4753fee61b985dc79d8804da34e0f0f0af7#egg=pixels
+
+tensorflow-addons==0.12.1
+tensorflow==2.4.1
