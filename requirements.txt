@@ -22,7 +22,7 @@ boto3==1.17.1
     #   django-s3-storage
     #   kappa
     #   zappa
-botocore==1.20.75
+botocore==1.20.77
     # via
     #   boto3
     #   s3transfer
@@ -119,7 +119,7 @@ pg8000==1.18.0
     # via pixels
 pip-tools==6.1.0
     # via zappa
-git+ssh://git@github.com/tesselo/pixels.git@2b7f7dde291008ef3529dcda51226cad9ccf6a8e#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@ef49b4753fee61b985dc79d8804da34e0f0f0af7#egg=pixels
     # via -r requirements.in
 placebo==0.9.0
     # via kappa
@@ -211,9 +211,7 @@ wheel==0.36.2
 wsgi-request-logger==0.4.6
     # via zappa
 zappa==0.52.0
-    # via
-    #   -r requirements.in
-    #   pixels
+    # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
