@@ -21,13 +21,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ./pxapi
-      - name: Checkout pixels
-        uses: actions/checkout@v2
-        with:
-          repository: tesselo/pixels
-          ref: 2b7f7dde291008ef3529dcda51226cad9ccf6a8e
-          token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
-          path: ./pixels
       - name: Install linters
         run: pip install isort black flake8
       - name: Lint with Flake8
@@ -36,10 +29,17 @@ jobs:
         run: isort --check --diff pxapi
       - name: Lint with black
         run: black --check --diff pxapi
+      - name: Setup SSH keys
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Install deps
         run: |
-          pip install ./pixels
           pip install -r ./pxapi/requirements.txt
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Test
         run: python ./pxapi/manage.py test ./pxapi/tests
 
@@ -57,13 +57,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ./pxapi
-      - name: Checkout pixels
-        uses: actions/checkout@v2
-        with:
-          repository: tesselo/pixels
-          ref: 2b7f7dde291008ef3529dcda51226cad9ccf6a8e
-          token: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPOS }}
-          path: ./pixels
+      - name: Setup SSH keys
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Create virtualenv and install deps
         run: |
           python -m pip install --upgrade pip virtualenv
@@ -71,6 +70,8 @@ jobs:
           source ./pxapi-venv/bin/activate
           pip install ./pixels
           pip install -r ./pxapi/requirements.txt
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       - name: Deploy
         run: |
           source ./pxapi-venv/bin/activate
