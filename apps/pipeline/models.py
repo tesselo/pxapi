@@ -77,7 +77,7 @@ class TrainingData(NamedModel):
             job = jobs.push(
                 const.TRAINING_DATA_PARSE_FUNCTION,
                 uri,
-                self.categorical,
+                str(self.categorical),
                 save_files,
                 description,
                 reference_date,
