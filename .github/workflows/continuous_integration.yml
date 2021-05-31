@@ -74,6 +74,10 @@ jobs:
         with:
           path: ./pxapi-venv
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      - name: Checkout pxapi
+        uses: actions/checkout@v2
+        with:
+          path: ./pxapi
       - name: Test
         run: |
           source ./pxapi-venv/bin/activate
@@ -90,6 +94,10 @@ jobs:
         with:
           path: ./pxapi-venv
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      - name: Checkout pxapi
+        uses: actions/checkout@v2
+        with:
+          path: ./pxapi
       - name: Deploy
         run: |
           source ./pxapi-venv/bin/activate
