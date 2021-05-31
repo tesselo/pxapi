@@ -61,6 +61,8 @@ jobs:
          virtualenv -p /usr/bin/python3 ./pxapi-venv
          source ./pxapi-venv/bin/activate
          pip install -r ./pxapi/requirements.txt
+       env:
+         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
   test:
     name: Tests
