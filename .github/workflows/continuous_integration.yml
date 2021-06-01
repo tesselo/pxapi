@@ -20,16 +20,20 @@ jobs:
         with:
           python-version: 3.8
       - name: Install Python dependencies
-        run: pip install black flake8
+        run: pip install black flake8 mypy
       - name: Run black and flake
         uses: wearerequired/lint-action@v1
         with:
           black: true
           flake8: true
+          mypy: true
       - name: Run isort
         uses: jamescurtin/isort-action@master
         with:
           requirementsFiles: "requirements.txt dev_requirements.txt"
+      - name: Run woke
+        uses: get-woke/woke-action@v0
+
 
   python_dependencies:
     name: Python dependencies
