@@ -16,4 +16,4 @@ sat-stac==0.4.0
 sentry-sdk
 uritemplate==3.0.1
 zappa==0.52.0
-git+ssh://git@github.com/tesselo/pixels.git@506c1e16b6501daf22ea70516353cc6f3351ae54#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@de5790176797509ebb7158a52c68dadedb6e4934#egg=pixels
