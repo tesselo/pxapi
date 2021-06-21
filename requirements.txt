@@ -121,8 +121,7 @@ pg8000==1.18.0
     # via pixels
 pip-tools==6.1.0
     # via zappa
-git+ssh://git@github.com/tesselo/pixels.git@de5790176797509ebb7158a52c68dadedb6e4934#egg=pixels
-    # via -r requirements.in
+git+ssh://git@github.com/tesselo/pixels.git@6b24d71b3826a85b58e5892cded28c959661fd42#egg=pixels
 placebo==0.9.0
     # via kappa
 psycopg2-binary==2.8.6
