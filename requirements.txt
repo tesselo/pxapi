@@ -121,7 +121,7 @@ pg8000==1.18.0
     # via pixels
 pip-tools==6.2.0
     # via zappa
-git+ssh://git@github.com/tesselo/pixels.git@f06db06f3340ffb93762b1b64e7a30bcfd8d422c#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@7d6a486cc964ac4ba7ffe0c1665592362604fd97#egg=pixels
     # via -r requirements.in
 placebo==0.9.0
     # via kappa
@@ -197,8 +197,10 @@ toml==0.10.2
     #   zappa
 tqdm==4.61.2
     # via zappa
-troposphere==3.0.1
-    # via zappa
+troposphere==2.7.1
+    # via
+    #   -r requirements.in
+    #   zappa
 uritemplate==3.0.1
     # via
     #   -r requirements.in
