@@ -197,8 +197,10 @@ toml==0.10.2
     #   zappa
 tqdm==4.61.2
     # via zappa
-troposphere==3.0.1
-    # via zappa
+troposphere==2.7.1
+    # via
+    #   -r requirements.in
+    #   zappa
 uritemplate==3.0.1
     # via
     #   -r requirements.in
