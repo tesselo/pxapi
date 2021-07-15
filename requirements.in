@@ -17,4 +17,4 @@ sentry-sdk
 uritemplate==3.0.1
 zappa==0.52.0
 troposphere<3
-git+ssh://git@github.com/tesselo/pixels.git@f06db06f3340ffb93762b1b64e7a30bcfd8d422c#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@7d6a486cc964ac4ba7ffe0c1665592362604fd97#egg=pixels
