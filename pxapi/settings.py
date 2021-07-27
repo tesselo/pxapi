@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import logging
 import os
 import sys
 from pathlib import Path
@@ -16,6 +17,7 @@ from pathlib import Path
 import sentry_sdk
 import structlog
 from sentry_sdk.integrations.django import DjangoIntegration
+from structlog_sentry import SentryJsonProcessor
 
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN", ""),
@@ -235,6 +237,7 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
+        SentryJsonProcessor(level=logging.ERROR, tag_keys="__all__"),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ],
     context_class=structlog.threadlocal.wrap_dict(dict),
