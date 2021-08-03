@@ -1,9 +1,11 @@
 import structlog
 from batch.models import BatchJob
+from zappa.asynchronous import task
 
 logger = structlog.getLogger(__name__)
 
 
+@task
 def scan_active_tasks():
     """
     Refresh job status and description.

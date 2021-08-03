@@ -13,6 +13,12 @@
         "slim_handler": true,
         "num_retained_versions": 5,
         "debug": false,
+        "events": [
+          {
+            "function": "apps.batch.tasks.scan_active_tasks",
+            "expression": "rate(6 hours)"
+          }
+        ],
         "environment_variables": {
           "AWS_REQUEST_PAYER": "requester",
           "AWS_STORAGE_BUCKET_NAME_MEDIA": "pxapi-media-dev",
