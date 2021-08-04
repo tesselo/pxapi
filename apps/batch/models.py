@@ -17,6 +17,7 @@ class BatchJob(models.Model):
     SUCCEEDED = "SUCCEEDED"
     FAILED = "FAILED"
     STATUS_CHOICES = (
+        (UNKNOWN, UNKNOWN),
         (SUBMITTED, SUBMITTED),
         (PENDING, PENDING),
         (RUNNABLE, RUNNABLE),
