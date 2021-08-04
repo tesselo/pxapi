@@ -22,8 +22,8 @@ from structlog_sentry import SentryJsonProcessor
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN", ""),
     integrations=[DjangoIntegration()],
-    # Set traces_sample_rate to 1.0 to capture 100%
-    traces_sample_rate=1.0,
+    # Set traces_sample_rate to 0.1 to capture 10%
+    traces_sample_rate=0.1,
     # Associate django users to errors
     send_default_pii=True,
 )
