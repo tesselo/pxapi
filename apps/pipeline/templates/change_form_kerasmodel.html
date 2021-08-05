@@ -1,0 +1,8 @@
+{% extends "change_form.html" %}
+{% load pipeline %}
+
+{% block object-tools-items %}
+<li><a href='http{% if "127.0.0" not in request.META.HTTP_HOST %}s{% endif %}://{{ request.META.HTTP_HOST }}/{{ original|to_class_name }}/{{ original.pk }}/history'>Keras History</a></li>
+<li><a href='http{% if "127.0.0" not in request.META.HTTP_HOST %}s{% endif %}://{{ request.META.HTTP_HOST }}/{{ original|to_class_name }}/{{ original.pk }}/evaluation'>Keras Evaluation</a></li>
+{{ block.super }}
+{% endblock %}
