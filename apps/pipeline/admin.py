@@ -5,6 +5,7 @@ from pipeline.models import KerasModel, PixelsData, Prediction, TrainingData
 
 class NamedGuardedModelAdmin(GuardedModelAdmin):
     search_fields = ["name", "description"]
+    change_form_template = "change_form.html"
 
 
 class TrainingDataAdmin(NamedGuardedModelAdmin):
@@ -17,6 +18,7 @@ class PixelsDataAdmin(NamedGuardedModelAdmin):
 
 class KerasModelAdmin(NamedGuardedModelAdmin):
     list_filter = ["batchjob_train__status"]
+    change_form_template = "change_form_kerasmodel.html"
 
 
 class PredictionAdmin(NamedGuardedModelAdmin):
