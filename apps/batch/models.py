@@ -34,6 +34,11 @@ class BatchJob(models.Model):
     description = models.JSONField(default=dict, blank=True)
     log_stream_name = models.CharField(max_length=1500, default="", blank=True)
 
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created"]
+
     def __str__(self):
         return "{} | {}".format(self.job_id, self.status)
 

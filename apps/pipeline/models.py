@@ -21,9 +21,11 @@ class NamedModel(models.Model):
     description = models.TextField(
         default="", blank=True, help_text="Detailed description of the object."
     )
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     def __str__(self):
         return self.name
