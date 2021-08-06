@@ -33,22 +33,26 @@ class NamedGuardedModelAdmin(GuardedModelAdmin):
 class TrainingDataAdmin(NamedGuardedModelAdmin):
     list_filter = ["batchjob_parse__status"]
     status_key = "batchjob_parse"
+    readonly_fields = ["batchjob_parse"]
 
 
 class PixelsDataAdmin(NamedGuardedModelAdmin):
     list_filter = ["batchjob_collect_pixels__status", "batchjob_create_catalog__status"]
     status_key = "batchjob_create_catalog"
+    readonly_fields = ["batchjob_collect_pixels", "batchjob_create_catalog"]
 
 
 class KerasModelAdmin(NamedGuardedModelAdmin):
     list_filter = ["batchjob_train__status"]
     change_form_template = "change_form_kerasmodel.html"
     status_key = "batchjob_train"
+    readonly_fields = ["batchjob_train"]
 
 
 class PredictionAdmin(NamedGuardedModelAdmin):
     list_filter = ["batchjob_predict__status", "batchjob_create_catalog__status"]
     status_key = "batchjob_create_catalog"
+    readonly_fields = ["batchjob_predict", "batchjob_create_catalog"]
 
 
 admin.site.register(TrainingData, TrainingDataAdmin)
