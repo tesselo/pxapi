@@ -1,6 +1,7 @@
 import json
 
 from batch.const import BATCH_JOB_FINAL_STATUSES
+from batch.models import BatchJob
 from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
 from pipeline.exceptions import UpdateBeforeFinishedExeption
@@ -122,12 +123,15 @@ class TrainingDataViewSet(TesseloApiViewSet):
         """
         Access STAC catalog.
         """
-        # Get object.
         obj = self.get_object()
-        # Set data to default None.
         data = None
-        # If bucket name was specified, use it to get data.
-        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+        # If the batch job has finished, get the data from the resulting json file.
+        if (
+            hasattr(obj, "batchjob_parse")
+            and obj.batchjob_parse
+            and obj.batchjob_parse.status == BatchJob.SUCCEEDED
+            and hasattr(settings, "AWS_S3_BUCKET_NAME")
+        ):
             data = json.loads(stac_s3_read_method(obj.catalog_uri))
         # Choose message.
         msg = "No catalog found." if data is None else "Found STAC catalog."
@@ -159,12 +163,15 @@ class PixelsDataViewSet(TesseloApiViewSet):
         """
         Access STAC catalog.
         """
-        # Get object.
         obj = self.get_object()
-        # Set data to default None.
         data = None
-        # If bucket name was specified, use it to get data.
-        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+        # If the batch job has finished, get the data from the resulting json file.
+        if (
+            hasattr(obj, "batchjob_create_catalog")
+            and obj.batchjob_create_catalog
+            and obj.batchjob_create_catalog.status == BatchJob.SUCCEEDED
+            and hasattr(settings, "AWS_S3_BUCKET_NAME")
+        ):
             data = json.loads(stac_s3_read_method(obj.collection_uri))
         # Choose message.
         msg = "No collection found." if data is None else "Found STAC collection."
@@ -193,10 +200,15 @@ class KerasModelViewSet(TesseloApiViewSet):
         """
         Access model training history.
         """
-        # Set data to default None.
+        obj = self.get_object()
         data = None
-        # If bucket name was specified, use it to get data.
-        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+        # If the batch job has finished, get the data from the resulting json file.
+        if (
+            hasattr(obj, "batchjob_train")
+            and obj.batchjob_train
+            and obj.batchjob_train.status == BatchJob.SUCCEEDED
+            and hasattr(settings, "AWS_S3_BUCKET_NAME")
+        ):
             uri = (
                 f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history_stats.json"
             )
@@ -220,10 +232,15 @@ class KerasModelViewSet(TesseloApiViewSet):
         """
         Access model evaluation statistics.
         """
-        # Set data to default None.
+        obj = self.get_object()
         data = None
-        # If bucket name was specified, use it to get data.
-        if hasattr(settings, "AWS_S3_BUCKET_NAME"):
+        # If the batch job has finished, get the data from the resulting json file.
+        if (
+            hasattr(obj, "batchjob_train")
+            and obj.batchjob_train
+            and obj.batchjob_train.status == BatchJob.SUCCEEDED
+            and hasattr(settings, "AWS_S3_BUCKET_NAME")
+        ):
             uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/evaluation_stats.json"
             data = json.loads(stac_s3_read_method(uri))
         # Choose message.
