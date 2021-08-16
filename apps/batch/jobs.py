@@ -15,7 +15,7 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
     ----------
     funk: str
         The module path to the function that shall be ran. For example,
-        pixels.stac.parse_training_data.
+        pixels.generator.stac.parse_training_data.
     args: positional input arguments, optional
         Positional arguments that will be passed to "funk".
     array_size: int, optional
