@@ -13,7 +13,7 @@ from pipeline.serializers import (
     PredictionSerializer,
     TrainingDataSerializer,
 )
-from pixels.stac import stac_s3_read_method
+from pixels.generator.stac import stac_s3_read_method
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter

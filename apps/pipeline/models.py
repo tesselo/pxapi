@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
-from pixels.stac_utils import get_catalog_length
+from pixels.generator.stac_utils import get_catalog_length
 
 logger = structlog.getLogger(__name__)
 
