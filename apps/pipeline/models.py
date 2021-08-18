@@ -327,21 +327,6 @@ class Prediction(NamedModel):
         editable=False,
         on_delete=models.PROTECT,
     )
-    batchjob_create_catalog = models.ForeignKey(
-        BatchJob,
-        blank=True,
-        null=True,
-        editable=False,
-        on_delete=models.PROTECT,
-        related_name="prediction_catalog",
-    )
-
-    @property
-    def items_uri(self):
-        """
-        The S3 uri pointintg to the stac catalog items from the batch job.
-        """
-        return f"s3://{settings.AWS_S3_BUCKET_NAME}/prediction/{self.pk}/stac"
 
     @property
     def generator_arguments_uri(self):
@@ -360,8 +345,7 @@ class Prediction(NamedModel):
         # Pre-create batch jobs.
         if not self.batchjob_predict:
             self.batchjob_predict = BatchJob.objects.create()
-        if not self.batchjob_create_catalog:
-            self.batchjob_create_catalog = BatchJob.objects.create()
+
         super().save(*args, **kwargs)
 
         # If media bucket was specified, run job.
@@ -405,17 +389,3 @@ class Prediction(NamedModel):
             self.batchjob_predict.job_id = predict_job[BATCH_JOB_ID_KEY]
             self.batchjob_predict.status = BatchJob.SUBMITTED
             self.batchjob_predict.save()
-            # Push cataloging job, with the prediction job as dependency.
-            catalog_job = jobs.push(
-                const.PREDICTION_CREATE_CATALOG_FUNCTION,
-                self.items_uri,
-                "_item.json",
-                self.name,
-                self.description,
-                self.pixelsdata.collection_uri,
-                depends_on=[predict_job[BATCH_JOB_ID_KEY]],
-            )
-            # Register parse job id and submitted state.
-            self.batchjob_create_catalog.job_id = catalog_job[BATCH_JOB_ID_KEY]
-            self.batchjob_create_catalog.status = BatchJob.SUBMITTED
-            self.batchjob_create_catalog.save()

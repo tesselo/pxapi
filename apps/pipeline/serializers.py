@@ -71,7 +71,6 @@ class KerasModelSerializer(TesseloBaseSerializer):
 class PredictionSerializer(TesseloBaseSerializer):
 
     batchjob_predict = BatchJobSerializer(read_only=True)
-    batchjob_create_catalog = BatchJobSerializer(read_only=True)
 
     class Meta:
         model = Prediction
@@ -79,5 +78,4 @@ class PredictionSerializer(TesseloBaseSerializer):
         read_only_fields = [
             "generator_arguments_file",
             "batchjob_predict",
-            "batchjob_create_catalog",
         ]

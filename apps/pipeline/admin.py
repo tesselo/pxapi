@@ -78,9 +78,9 @@ class KerasModelAdmin(NamedGuardedModelAdmin):
 
 
 class PredictionAdmin(NamedGuardedModelAdmin):
-    list_filter = ["batchjob_predict__status", "batchjob_create_catalog__status"]
-    status_keys = ["batchjob_predict", "batchjob_create_catalog"]
-    readonly_fields = ["batchjob_predict", "batchjob_create_catalog"]
+    list_filter = ["batchjob_predict__status"]
+    status_keys = ["batchjob_predict"]
+    readonly_fields = ["batchjob_predict"]
 
 
 admin.site.register(TrainingData, TrainingDataAdmin)

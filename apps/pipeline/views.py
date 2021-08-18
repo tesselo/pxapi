@@ -254,7 +254,7 @@ class PredictionViewSet(TesseloApiViewSet):
     Manage model predictions.
     """
 
-    _job_field_names = ["batchjob_predict", "batchjob_create_catalog"]
+    _job_field_names = ["batchjob_predict"]
 
     queryset = Prediction.objects.all().order_by("name")
     serializer_class = PredictionSerializer
