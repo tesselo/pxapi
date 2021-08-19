@@ -84,16 +84,16 @@ def tilesview(request, z, x, y, platform=""):
         bands = ["B3", "B2", "B1"]
         scaling = 100
         sensor = "TM"
-    elif platform is None and end < "2000-01-01":
+    elif not platform and end < "2000-01-01":
         platform = ["LANDSAT_4", "LANDSAT_5"]
         bands = ["B3", "B2", "B1"]
         scaling = 100
         sensor = "TM"
-    elif platform == "LANDSAT_7" or (platform is None and end < "2014-01-01"):
+    elif platform == "LANDSAT_7" or (not platform and end < "2014-01-01"):
         platform = ["LANDSAT_7"]
         bands = ["B3", "B2", "B1"]
         scaling = 255
-    elif platform == "LANDSAT_8" or (platform is None and end < "2018-01-01"):
+    elif platform == "LANDSAT_8" or (not platform and end < "2018-01-01"):
         print("LS8")
         platform = ["LANDSAT_8"]
         bands = ["B4", "B3", "B2"]
