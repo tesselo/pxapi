@@ -1,8 +1,11 @@
+import os
+
 import numpy
 import rasterio
 import sentry_sdk
+from django.http import HttpResponse
 from pixels import algebra, const
-from pixels.exceptions import PixelsFailed
+from pixels.exceptions import PixelsException
 
 
 def rescale_to_channel_range(data, dfrom, dto, dover=None):
@@ -43,7 +46,7 @@ def hex_to_rgba(value, alpha=255):
 
     # Check length and input string property
     if len(value) not in [1, 2, 3, 6] or not value.isalnum():
-        raise PixelsFailed("Invalid color, could not convert hex to rgb.")
+        raise PixelsException("Invalid color, could not convert hex to rgb.")
 
     # Repeat values for shortened input
     value = (value * 6)[:6]
@@ -175,3 +178,10 @@ def get_s2_formula_pixels(
     mask = numpy.all([dat != 0 for dat in data.values()], axis=0) * 255
 
     return red, green, blue, mask
+
+
+def get_empty_response(zoom=True):
+    path = os.path.dirname(os.path.abspath(__file__))
+    filename = "assets/tesselo_zoom_in_more.png" if zoom else "assets/tesselo_empty.png"
+    path = os.path.join(path, filename)
+    return HttpResponse(open(path, "rb"), content_type="image/png")

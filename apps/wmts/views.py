@@ -1,6 +1,5 @@
 import datetime
 import io
-import os
 
 import mercantile
 import numpy
@@ -11,6 +10,7 @@ from pixels.mosaic import latest_pixel
 from rest_framework.decorators import api_view
 from tsuser.const import GET_QUERY_PARAMETER_AUTH_KEY
 from wmts import const, wmts
+from wmts.utils import get_empty_response
 
 
 @api_view(["GET"])
@@ -39,9 +39,7 @@ def tilesview(request, z, x, y, platform=""):
     """
     # Check for minimum zoom.
     if z < const.PIXELS_MIN_ZOOM:
-        path = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(path, "assets/tesselo_zoom_in_more.png")
-        return HttpResponse(open(path, "rb"), content_type="image/png")
+        return get_empty_response()
 
     # Retrieve end date from query args.
     end = request.GET.get("end")
@@ -96,6 +94,7 @@ def tilesview(request, z, x, y, platform=""):
         bands = ["B3", "B2", "B1"]
         scaling = 255
     elif platform == "LANDSAT_8" or (platform is None and end < "2018-01-01"):
+        print("LS8")
         platform = ["LANDSAT_8"]
         bands = ["B4", "B3", "B2"]
         scaling = 30000
@@ -121,6 +120,10 @@ def tilesview(request, z, x, y, platform=""):
         level=level,
         sensor=sensor,
     )
+
+    if stack is None:
+        return get_empty_response(zoom=False)
+
     if "formula" in request.GET:
         # Obtain bands from request.
         bands = request.GET.get("bands").split(",")
