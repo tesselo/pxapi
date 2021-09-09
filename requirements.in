@@ -18,4 +18,4 @@ structlog-sentry
 uritemplate==3.0.1
 zappa==0.52.0
 troposphere<3
-git+ssh://git@github.com/tesselo/pixels.git@b2dd02b9c8f4ea7ffb754cff5f3439134fd8dfba#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@03bf406cc6de2f3d51cc2e2814df28688dbf4340#egg=pixels
