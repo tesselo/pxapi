@@ -126,8 +126,8 @@ class PixelsData(NamedModel):
         return f"s3://{settings.AWS_S3_BUCKET_NAME}/pixelsdata/{self.pk}/{const.PIXELS_DATA_COLLECTION_LOCATION}"
 
     @property
-    def catalog_dict_uri(self):
-        return f"s3://{settings.AWS_S3_BUCKET_NAME}/pixelsdata/{self.pk}/{const.PIXELS_DATA_CATALOG_DICT_LOCATION}"
+    def catalogs_dict_uri(self):
+        return f"s3://{settings.AWS_S3_BUCKET_NAME}/pixelsdata/{self.pk}/{const.PIXELS_DATA_CATALOGS_DICT_LOCATION}"
 
     def save(self, *args, **kwargs):
         # Save a copy of the config data as file for the DB independent batch
@@ -359,11 +359,13 @@ class Prediction(NamedModel):
                 f"The generator arguments uri is {self.generator_arguments_uri}."
             )
             logger.debug(f"The collection uri is {self.pixelsdata.collection_uri}.")
-            logger.debug(f"The catalog_dict uri is {self.pixelsdata.catalog_dict_uri}.")
+            logger.debug(
+                f"The catalogs_dict uri is {self.pixelsdata.catalogs_dict_uri}."
+            )
             # TODO: Make sure the catalog exists, i.e. that the previous job
             # has finished. This currently leads to a server error.
             # Count number of items in the catalog.
-            number_of_items = len(_load_dictionary(self.pixelsdata.catalog_dict_uri))
+            number_of_items = len(_load_dictionary(self.pixelsdata.catalogs_dict_uri))
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
             max_number_jobs = 1000
