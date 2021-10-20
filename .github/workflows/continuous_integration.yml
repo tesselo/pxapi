@@ -61,6 +61,7 @@ jobs:
          python -m pip install --upgrade pip virtualenv
          virtualenv -p /usr/bin/python3 ./pxapi-venv
          source ./pxapi-venv/bin/activate
+         pip install setuptools==57.5.0
          pip install -r ./pxapi/requirements.txt
        env:
          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
