@@ -13,10 +13,6 @@ upgrade_dependencies: dev_install
 	pip-compile --upgrade --output-file ./requirements.txt requirements.in
 	pip-compile --upgrade --output-file ./dev_requirements.txt dev_requirements.in
 
-#
-#   Extended Reports
-#
-.PHONY: coverage
 
 coverage:
 	coverage run --source='.' manage.py test tests/
@@ -31,10 +27,28 @@ pre-commit:
 
 check: pre-commit coverage
 
-semgrep:
-	semgrep --config=p/r2c-ci --config=p/django
+#
+#   Extended Reports
+#
+.PHONY: smells security complexity check-advanced check-extended
 
-check-extended: check semgrep
+smells:
+	semgrep --config=p/r2c-ci --config=p/python
+
+security:
+	bandit -r apps pxapi
+
+complexity:
+	wily build apps pxapi
+	wily report apps
+	wily report pxapi
+
+doc-style:
+	pydocstyle --match-dir="[^(\.|migrations)].*" apps pxapi
+
+check-advanced: smells security
+check-picky: complexity doc-style
+check-extended: check check-advanced check-picky
 
 #
 #   Code Checks auto-fix
