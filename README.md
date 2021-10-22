@@ -29,5 +29,35 @@ If the pre-commit configuration file is changed, remember to run `make dev_insta
 To manually force run the pre-commit tasks, you can type:
 
 ```bash
-pre-commit run --all-files
+make pre-commit
+```
+
+## Make targets
+
+The `Makefile` is a good resource to see how things are done.
+Some of these targets include:
+
+### Common checks before opening a PR
+
+Includes the pre-commit hooks and running the tests with 
+code coverage reports.
+
+```bash
+make check
+```
+
+
+### Extended checks to know more about the code
+
+Includes security checks and other code smells.
+
+```bash
+make check-advanced
+```
+
+### Picky checks to be a code snob
+
+Includes code complexity and documentation style checks.
+```bash
+make check-picky
 ```
