@@ -13,7 +13,7 @@ from pipeline.serializers import (
     PredictionSerializer,
     TrainingDataSerializer,
 )
-from pixels.generator.stac import stac_s3_read_method
+from pixels.generator import stac
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -132,7 +132,7 @@ class TrainingDataViewSet(TesseloApiViewSet):
             and obj.batchjob_parse.status == BatchJob.SUCCEEDED
             and hasattr(settings, "AWS_S3_BUCKET_NAME")
         ):
-            data = json.loads(stac_s3_read_method(obj.catalog_uri))
+            data = json.loads(stac.read_method(obj.catalog_uri))
         # Choose message.
         msg = "No catalog found." if data is None else "Found STAC catalog."
         # Return data.
@@ -172,7 +172,7 @@ class PixelsDataViewSet(TesseloApiViewSet):
             and obj.batchjob_create_catalog.status == BatchJob.SUCCEEDED
             and hasattr(settings, "AWS_S3_BUCKET_NAME")
         ):
-            data = json.loads(stac_s3_read_method(obj.collection_uri))
+            data = json.loads(stac.read_method(obj.collection_uri))
         # Choose message.
         msg = "No collection found." if data is None else "Found STAC collection."
         # Return data.
@@ -212,7 +212,7 @@ class KerasModelViewSet(TesseloApiViewSet):
             uri = (
                 f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history_stats.json"
             )
-            data = json.loads(stac_s3_read_method(uri))
+            data = json.loads(stac.read_method(uri))
         # Choose message.
         msg = "No history found." if data is None else "Found history."
         # Return data.
@@ -242,7 +242,7 @@ class KerasModelViewSet(TesseloApiViewSet):
             and hasattr(settings, "AWS_S3_BUCKET_NAME")
         ):
             uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/evaluation_stats.json"
-            data = json.loads(stac_s3_read_method(uri))
+            data = json.loads(stac.read_method(uri))
         # Choose message.
         msg = "No evaluation found." if data is None else "Found evaluation."
         # Return data.
