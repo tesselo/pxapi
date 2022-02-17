@@ -15,6 +15,6 @@ sentry-sdk
 structlog-sentry
 uritemplate==3.0.1
 zappa
-git+ssh://git@github.com/tesselo/pixels.git@24f76bd7b38217c0f219029b4a33b8e7124fa7bc#egg=pixels
+git+ssh://git@github.com/tesselo/pixels.git@00fc6a4be1224c53cbbaed7f0c1b7894a3b29f7d#egg=pixels
 
 placebo==0.9.0  # kappa / zappa conflict
