@@ -135,7 +135,7 @@ pg8000==1.24.0
     # via pixels
 pip-tools==6.5.1
     # via zappa
-pixels @ git+ssh://git@github.com/tesselo/pixels.git@df7e6e4df95bb3ca38afa66d54c674f6b6b44871
+pixels @ git+ssh://git@github.com/tesselo/pixels.git@99e74f2a1f5a30f5fd8595a56163ecab485ad74b
     # via -r requirements.in
 placebo==0.9.0
     # via
