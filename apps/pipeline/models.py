@@ -331,6 +331,15 @@ class Prediction(NamedModel):
         null=True,
         editable=False,
         on_delete=models.PROTECT,
+        related_name="prediction_run",
+    )
+    batchjob_merge_predictions = models.ForeignKey(
+        BatchJob,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.PROTECT,
+        related_name="prediction_merge",
     )
 
     @property
@@ -350,7 +359,8 @@ class Prediction(NamedModel):
         # Pre-create batch jobs.
         if not self.batchjob_predict:
             self.batchjob_predict = BatchJob.objects.create()
-
+        if not self.batchjob_merge_predictions:
+            self.batchjob_merge_predictions = BatchJob.objects.create()
         super().save(*args, **kwargs)
 
         # If media bucket was specified, run job.
@@ -397,3 +407,14 @@ class Prediction(NamedModel):
             self.batchjob_predict.job_id = predict_job[BATCH_JOB_ID_KEY]
             self.batchjob_predict.status = BatchJob.SUBMITTED
             self.batchjob_predict.save()
+
+            # Push merging job, with the prediction job as dependency.
+            merge_job = jobs.push(
+                const.PREDICTION_MERGE_RASTER_FUNCTION,
+                self.generator_arguments_uri,
+                depends_on=[predict_job[BATCH_JOB_ID_KEY]],
+            )
+            # Register merging job id and submitted state.
+            self.batchjob_merge_predictions.job_id = merge_job[BATCH_JOB_ID_KEY]
+            self.batchjob_merge_predictions.status = BatchJob.SUBMITTED
+            self.batchjob_merge_predictions.save()
