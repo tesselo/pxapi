@@ -10,7 +10,8 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
-from pixels.generator.stac_utils import _load_dictionary, get_catalog_length
+from pixels.generator.stac_utils import get_catalog_length
+from pixels.utils import load_dictionary
 
 logger = structlog.getLogger(__name__)
 
@@ -365,7 +366,7 @@ class Prediction(NamedModel):
             # TODO: Make sure the catalog exists, i.e. that the previous job
             # has finished. This currently leads to a server error.
             # Count number of items in the catalog.
-            number_of_items = len(_load_dictionary(self.pixelsdata.catalogs_dict_uri))
+            number_of_items = len(load_dictionary(self.pixelsdata.catalogs_dict_uri))
             # TODO: Item per job definition.
             # Set number of jobs based on catolog length, with maximun ceiling.
             max_number_jobs = 1000
