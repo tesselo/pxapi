@@ -1,5 +1,5 @@
 # Training data sectoin.
-TRAINING_DATA_PARSE_FUNCTION = "pixels.generator.stac.parse_training_data"
+TRAINING_DATA_PARSE_FUNCTION = "pixels.generator.stac.parse_data"
 TRAINING_DATA_CATALOG_LOCATION = "stac/catalog.json"
 # Pixels data section.
 CONFIG_FILE_NAME = "config.json"
