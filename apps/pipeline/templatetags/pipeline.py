@@ -17,3 +17,14 @@ def s3_console_link(value):
         else "pxapi-media-dev"
     )
     return f"https://s3.console.aws.amazon.com/s3/buckets/{bucket}?region=eu-central-1&prefix={value.__class__.__name__.lower()}/{value.id}/&showversions=false"
+
+
+@register.filter
+def job_id(value, arg):
+    job = getattr(value, f"batchjob_{arg}")
+    return job.job_id
+
+
+@register.filter
+def logs_link(value):
+    return f"https://app.datadoghq.eu/logs?saved_view=47928&query=%40AWS_BATCH_JOB_ID%3A{value}%2A"

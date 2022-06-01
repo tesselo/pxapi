@@ -2,6 +2,7 @@
 {% load pipeline %}
 
 {% block object-tools-items %}
+    <li><a href="{{ original | job_id:"train" | logs_link }}">Train Logs</a></li>
 <li><a href='http{% if "127.0.0" not in request.META.HTTP_HOST %}s{% endif %}://{{ request.META.HTTP_HOST }}/{{ original|to_class_name }}/{{ original.pk }}/history'>Keras History</a></li>
 <li><a href='http{% if "127.0.0" not in request.META.HTTP_HOST %}s{% endif %}://{{ request.META.HTTP_HOST }}/{{ original|to_class_name }}/{{ original.pk }}/evaluation'>Keras Evaluation</a></li>
 {{ block.super }}
