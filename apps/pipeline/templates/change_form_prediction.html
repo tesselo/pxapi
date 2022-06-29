@@ -2,6 +2,6 @@
 {% load pipeline %}
 
 {% block object-tools-items %}
-    <li><a href="{{ original | job_id:"predict" | logs_link }}">Prediction Logs</a></li>
+    <li><a href="{{ original | job_id:"predict" | logs_link:"predict" }}">Prediction Logs</a></li>
 {{ block.super }}
 {% endblock %}

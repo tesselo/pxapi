@@ -1,7 +1,12 @@
 from django import template
 from django.conf import settings
+from pipeline.const import DATADOG_VIEWS
 
 register = template.Library()
+
+
+def datadog_view(step):
+    return DATADOG_VIEWS.get(step, DATADOG_VIEWS["default"])
 
 
 @register.filter
@@ -26,5 +31,5 @@ def job_id(value, arg):
 
 
 @register.filter
-def logs_link(value):
-    return f"https://app.datadoghq.eu/logs?saved_view=47928&query=%40AWS_BATCH_JOB_ID%3A{value}%2A"
+def logs_link(value, arg):
+    return f"https://app.datadoghq.eu/logs?saved_view={datadog_view(arg)}&query=%40AWS_BATCH_JOB_ID%3A{value}%2A"
