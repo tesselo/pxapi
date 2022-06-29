@@ -2,7 +2,7 @@
 {% load pipeline %}
 
 {% block object-tools-items %}
-    <li><a href="{{ original | job_id:"collect_pixels" | logs_link }}">Collect Logs</a></li>
-    <li><a href="{{ original | job_id:"create_catalog" | logs_link }}">Catalog Logs</a></li>
+    <li><a href="{{ original | job_id:"collect_pixels" | logs_link:"collect_pixels" }}">Collect Logs</a></li>
+    <li><a href="{{ original | job_id:"create_catalog" | logs_link:"create_catalog" }}">Catalog Logs</a></li>
 {{ block.super }}
 {% endblock %}
