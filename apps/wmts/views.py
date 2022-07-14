@@ -6,7 +6,7 @@ import numpy
 import rasterio
 from django.http import HttpResponse
 from pixels.algebra import colors, parser
-from pixels.mosaic import latest_pixel
+from pixels.mosaic import first_valid_pixel
 from rest_framework.decorators import api_view
 from tsuser.const import GET_QUERY_PARAMETER_AUTH_KEY
 from wmts import const, wmts
@@ -107,7 +107,7 @@ def tilesview(request, z, x, y, platform=""):
     if "bands" in request.GET:
         bands = request.GET.get("bands").split(",")
     # Get pixels.
-    creation_args, date, stack = latest_pixel(
+    creation_args, date, stack = first_valid_pixel(
         geojson,
         end,
         scale,
