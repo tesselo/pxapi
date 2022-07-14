@@ -8,7 +8,7 @@ affine==2.3.1
     # via rasterio
 argcomplete==2.0.0
     # via zappa
-asgiref==3.5.1
+asgiref==3.5.2
     # via django
 asn1crypto==1.5.1
     # via scramp
@@ -17,19 +17,21 @@ attrs==21.4.0
     #   fiona
     #   jsonschema
     #   rasterio
-backoff==2.0.1
+backoff==2.1.2
     # via pixels
-boto3==1.22.7
+boto3==1.24.30
     # via
     #   -r requirements.in
     #   django-s3-storage
     #   kappa
     #   zappa
-botocore==1.25.7
+botocore==1.27.30
     # via
     #   boto3
     #   s3transfer
-certifi==2021.10.8
+build==0.8.0
+    # via pip-tools
+certifi==2022.6.15
     # via
     #   fiona
     #   pyproj
@@ -38,7 +40,7 @@ certifi==2021.10.8
     #   sentry-sdk
 cfn-flip==1.3.0
     # via troposphere
-charset-normalizer==2.0.12
+charset-normalizer==2.1.0
     # via requests
 click==8.1.3
     # via
@@ -59,6 +61,8 @@ cligj==0.7.2
     # via
     #   fiona
     #   rasterio
+colorama==0.4.5
+    # via kiwi-structlog-config
 django==3.1.13
     # via
     #   -r requirements.in
@@ -94,9 +98,9 @@ fiona==1.8.21
     # via geopandas
 future==0.18.2
     # via zappa
-geojson-pydantic==0.3.4
+geojson-pydantic==0.4.2
     # via pixels
-geopandas==0.10.2
+geopandas==0.11.0
     # via pixels
 greenlet==1.1.2
     # via sqlalchemy
@@ -106,38 +110,44 @@ hjson==3.0.2
     # via zappa
 idna==3.3
     # via requests
-importlib-resources==5.7.1
+importlib-resources==5.8.0
     # via jsonschema
 inflection==0.5.1
     # via drf-spectacular
-jmespath==1.0.0
+jmespath==1.0.1
     # via
     #   boto3
     #   botocore
     #   zappa
-jsonschema==4.4.0
+jsonschema==4.7.2
     # via drf-spectacular
 kappa==0.6.0
     # via zappa
+kiwi-structlog-config==0.1.8
+    # via pixels
 mercantile==1.2.1
     # via -r requirements.in
 munch==2.5.0
     # via fiona
-numpy==1.22.3
+numpy==1.23.1
     # via
     #   h5py
     #   pandas
     #   rasterio
     #   snuggs
-pandas==1.4.2
+packaging==21.3
+    # via
+    #   build
+    #   geopandas
+pandas==1.4.3
     # via geopandas
 pep517==0.12.0
-    # via pip-tools
-pg8000==1.26.1
+    # via build
+pg8000==1.29.1
     # via pixels
-pip-tools==6.6.0
+pip-tools==6.8.0
     # via zappa
-pixels @ git+ssh://git@github.com/tesselo/pixels.git@ca4018aac4e040e9177255dff83292e56f768b81
+pixels @ git+ssh://git@github.com/tesselo/pixels.git@d945804691e29395bbfcf8a12347b608596dfe55
     # via -r requirements.in
 placebo==0.9.0
     # via
@@ -145,12 +155,13 @@ placebo==0.9.0
     #   kappa
 psycopg2-binary==2.8.6
     # via -r requirements.in
-pydantic==1.9.0
+pydantic==1.9.1
     # via
     #   geojson-pydantic
     #   pixels
-pyparsing==3.0.8
+pyparsing==3.0.9
     # via
+    #   packaging
     #   pixels
     #   snuggs
 pyproj==3.3.1
@@ -180,39 +191,45 @@ pyyaml==5.4.1
     #   drf-spectacular
     #   kappa
     #   zappa
-rasterio==1.2.10
+rasterio==1.3.0
     # via
     #   -r requirements.in
     #   pixels
-requests==2.27.1
+requests==2.28.1
     # via zappa
-s3transfer==0.5.2
+s3transfer==0.6.0
     # via boto3
 scramp==1.4.1
     # via pg8000
-sentry-sdk==1.5.11
+sentry-sdk==1.7.1
     # via
     #   -r requirements.in
     #   pixels
     #   structlog-sentry
 shapely==1.8.2
     # via geopandas
+simplejson==3.17.6
+    # via kiwi-structlog-config
 six==1.16.0
     # via
     #   cfn-flip
     #   fiona
     #   h5py
+    #   munch
     #   python-dateutil
     #   zappa
+slack-sdk==3.17.2
+    # via pixels
 snuggs==1.4.7
     # via rasterio
-sqlalchemy==1.4.36
+sqlalchemy==1.4.39
     # via pixels
 sqlparse==0.4.2
     # via django
 structlog==21.5.0
     # via
     #   django-structlog
+    #   kiwi-structlog-config
     #   pixels
 structlog-sentry==1.4.0
     # via
@@ -223,18 +240,20 @@ text-unidecode==1.3
 toml==0.10.2
     # via zappa
 tomli==2.0.1
-    # via pep517
+    # via
+    #   build
+    #   pep517
 tqdm==4.64.0
     # via zappa
-troposphere==4.0.1
+troposphere==4.0.2
     # via zappa
-typing-extensions==4.2.0
+typing-extensions==4.3.0
     # via pydantic
 uritemplate==3.0.1
     # via
     #   -r requirements.in
     #   drf-spectacular
-urllib3==1.26.9
+urllib3==1.26.10
     # via
     #   botocore
     #   requests
@@ -247,9 +266,9 @@ wheel==0.37.1
     #   zappa
 wsgi-request-logger==0.4.6
     # via zappa
-zappa==0.54.1
+zappa==0.54.2
     # via -r requirements.in
-zipp==3.8.0
+zipp==3.8.1
     # via importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
