@@ -11,7 +11,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from pipeline import const
 from pixels.generator.stac_utils import get_catalog_length
-from pixels.utils import load_dictionary
+from pixels.tio import load_dictionary
 
 logger = structlog.getLogger(__name__)
 
