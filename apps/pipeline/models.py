@@ -306,6 +306,7 @@ class KerasModel(NamedModel):
                 model_compile_arguments_uri,
                 model_fit_arguments_uri,
                 generator_arguments_uri,
+                self.name,
                 gpu=True,
             )
             # Register job id and submitted state.
