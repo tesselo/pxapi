@@ -36,6 +36,15 @@
     "production": {
       "log_level": "WARNING",
       "extends": "dev",
-      "domain": "pixels.tesselo.com"
+      "domain": "pixels.tesselo.com",
+      "s3_bucket": "zappa-pixels-production",
+      "environment_variables": {
+          "AWS_STORAGE_BUCKET_NAME_MEDIA": "pxapi-media-production",
+          "AWS_STORAGE_BUCKET_NAME_STATIC": "pxapi-static-production",
+          "DB_HOST": "tesselo-production.ce3mi8diupls.eu-west-1.rds.amazonaws.com",
+          "DB_USER": "tesselo",
+          "DB_NAME_PXAPI": "pxapi",
+          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696"
+        }
     }
 }
