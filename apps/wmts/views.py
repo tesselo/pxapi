@@ -5,11 +5,11 @@ import mercantile
 import numpy
 import rasterio
 from django.http import HttpResponse
-from pixels.algebra import colors, parser
 from pixels.mosaic import first_valid_pixel
 from rest_framework.decorators import api_view
 from tsuser.const import GET_QUERY_PARAMETER_AUTH_KEY
 from wmts import const, wmts
+from wmts.algebra import colors, parser
 from wmts.utils import get_empty_response
 
 
