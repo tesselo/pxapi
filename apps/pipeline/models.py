@@ -234,7 +234,9 @@ class KerasModel(NamedModel):
     )
     model_compile_arguments = models.JSONField(default=dict, blank=True)
     model_compile_arguments_file = models.FileField(
-        upload_to=model_compile_arguments_file_upload_to, null=True, editable=False
+        upload_to=model_compile_arguments_file_upload_to,
+        null=True,
+        editable=False,
     )
     model_fit_arguments = models.JSONField(default=dict, blank=True)
     model_fit_arguments_file = models.FileField(
@@ -290,7 +292,8 @@ class KerasModel(NamedModel):
                 settings.AWS_S3_BUCKET_NAME, self.model_configuration_file.name
             )
             model_compile_arguments_uri = "s3://{}/{}".format(
-                settings.AWS_S3_BUCKET_NAME, self.model_compile_arguments_file.name
+                settings.AWS_S3_BUCKET_NAME,
+                self.model_compile_arguments_file.name,
             )
             model_fit_arguments_uri = "s3://{}/{}".format(
                 settings.AWS_S3_BUCKET_NAME, self.model_fit_arguments_file.name
@@ -324,7 +327,9 @@ class Prediction(NamedModel):
     kerasmodel = models.ForeignKey(KerasModel, on_delete=models.PROTECT)
     generator_arguments = models.JSONField(default=dict, blank=True)
     generator_arguments_file = models.FileField(
-        upload_to=training_generator_arguments_file_upload_to, null=True, editable=False
+        upload_to=training_generator_arguments_file_upload_to,
+        null=True,
+        editable=False,
     )
     batchjob_predict = models.ForeignKey(
         BatchJob,

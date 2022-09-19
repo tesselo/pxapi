@@ -130,7 +130,17 @@ def get_s1_rgb_pixels(projectid, z, x, y):
 
 
 def get_s2_formula_pixels(
-    projectid, z, x, y, formula, color_from, color_to, color_over, dmin, dmax, frmt
+    projectid,
+    z,
+    x,
+    y,
+    formula,
+    color_from,
+    color_to,
+    color_over,
+    dmin,
+    dmax,
+    frmt,
 ):
     # Instantiate formula parser.
     parser = algebra.FormulaParser()

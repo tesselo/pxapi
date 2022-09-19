@@ -12,7 +12,9 @@ class PipelineViewTests(TestCase):
     def setUp(self):
         User = get_user_model()
         self.usr = User.objects.create_user(
-            username="michael", email="michael@bluth.com", password="bananastand"
+            username="michael",
+            email="michael@bluth.com",
+            password="bananastand",
         )
         self.client.login(username="michael", password="bananastand")
 
