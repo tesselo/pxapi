@@ -3,24 +3,25 @@ default_language_version:
 
 repos:
   - repo: https://gitlab.com/pycqa/flake8
-    rev: '84c95766e679710d9a0fa910a1cd276c87be42c5'
+    rev: '3.9.2'
     hooks:
       - id: flake8
 
   - repo: https://github.com/ambv/black
-    rev: 21.5b0
+    rev: 22.8.0
     hooks:
       - id: black
         args: [-tpy38, -q, --check]
 
   - repo: https://github.com/timothycrosley/isort
-    rev: 5.8.0
+    rev: 5.10.1
     hooks:
       - id: isort
+        args: ["--profile", "black"]
         types: [python]
 
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v2.2.0
+    rev: v9.1.0
     hooks:
       - id: commitlint
         stages: [ commit-msg ]
