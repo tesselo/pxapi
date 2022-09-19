@@ -12,7 +12,7 @@ pystac==0.5.4
 PyYAML==5.4.1
 rasterio
 sentry-sdk
-structlog-sentry
+structlog-sentry==1.4.0
 uritemplate==3.0.1
 zappa
 git+ssh://git@github.com/tesselo/pixels.git@57455f018f169cd3414948f92db3adf847f6d1ba#egg=pixels
