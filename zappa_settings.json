@@ -30,7 +30,8 @@
           "REQUESTS_CA_BUNDLE": "/var/task/botocore/cacert.pem",
           "GDAL_DISABLE_READDIR_ON_OPEN": "YES",
           "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif,.jp2",
-          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696"
+          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696",
+	      "ENVIRONMENT": "dev"
         }
     },
     "production": {
@@ -44,7 +45,8 @@
           "DB_HOST": "tesselo-production.ce3mi8diupls.eu-west-1.rds.amazonaws.com",
           "DB_USER": "tesselo",
           "DB_NAME_PXAPI": "pxapi",
-          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696"
+          "SENTRY_DSN": "https://8e8f178e95bc42b9946506480bd14ba8@o640190.ingest.sentry.io/5760696",
+	      "ENVIRONMENT": "production"
         }
     }
 }
