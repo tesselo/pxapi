@@ -56,4 +56,4 @@ check-extended: check check-advanced check-picky
 .PHONY: black
 
 black:
-	python -m black -l79 -tpy38 apps pxapi tests *.py
+	python -m black -tpy38 apps pxapi tests *.py
