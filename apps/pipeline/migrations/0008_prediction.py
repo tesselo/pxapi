@@ -41,7 +41,10 @@ class Migration(migrations.Migration):
                         help_text="Detailed description of the object.",
                     ),
                 ),
-                ("generator_arguments", models.JSONField(blank=True, default=dict)),
+                (
+                    "generator_arguments",
+                    models.JSONField(blank=True, default=dict),
+                ),
                 (
                     "generator_arguments_file",
                     models.FileField(

@@ -174,11 +174,7 @@ class PixelsDataViewSet(TesseloApiViewSet):
         ):
             data = json.loads(read_method(obj.collection_uri))
         # Choose message.
-        msg = (
-            "No collection found."
-            if data is None
-            else "Found STAC collection."
-        )
+        msg = "No collection found." if data is None else "Found STAC collection."
         # Return data.
         return Response({"message": msg, "stac_collection": data})
 
@@ -213,7 +209,9 @@ class KerasModelViewSet(TesseloApiViewSet):
             and obj.batchjob_train.status == BatchJob.SUCCEEDED
             and hasattr(settings, "AWS_S3_BUCKET_NAME")
         ):
-            uri = f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history_stats.json"
+            uri = (
+                f"s3://{settings.AWS_S3_BUCKET_NAME}/kerasmodel/{pk}/history_stats.json"
+            )
             data = json.loads(read_method(uri))
         # Choose message.
         msg = "No history found." if data is None else "Found history."

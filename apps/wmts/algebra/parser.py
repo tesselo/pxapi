@@ -90,9 +90,7 @@ class FormulaParser(object):
 
         # Atom core - a single element is either a math constant,
         # a function or a variable.
-        atom_core = (
-            function | pi | e | null | _true | _false | number | variable
-        )
+        atom_core = function | pi | e | null | _true | _false | number | variable
 
         # Atom subelement between parenthesis
         atom_subelement = lpar + self.bnf.suppress() + rpar
@@ -106,16 +104,10 @@ class FormulaParser(object):
         # "atom [ ^ atom ]...", we get right-to-left exponents, instead of
         # left-to-right that is, 2^3^2 = 2^(3^2), not (2^3)^2.
         factor = Forward()
-        factor << atom + ZeroOrMore(
-            (powop + factor).setParseAction(self.push_first)
-        )
+        factor << atom + ZeroOrMore((powop + factor).setParseAction(self.push_first))
 
-        term = factor + ZeroOrMore(
-            (multop + factor).setParseAction(self.push_first)
-        )
-        self.bnf << term + ZeroOrMore(
-            (addop + term).setParseAction(self.push_first)
-        )
+        term = factor + ZeroOrMore((multop + factor).setParseAction(self.push_first))
+        self.bnf << term + ZeroOrMore((addop + term).setParseAction(self.push_first))
 
     def push_first(self, strg, loc, toks):
         self.expr_stack.append(toks[0])
@@ -183,9 +175,7 @@ class FormulaParser(object):
         Store the input formula as the one to evaluate on.
         """
         # Remove any white space and line breaks from formula.
-        self.formula = (
-            formula.replace(" ", "").replace("\n", "").replace("\r", "")
-        )
+        self.formula = formula.replace(" ", "").replace("\n", "").replace("\r", "")
 
     def prepare_data(self):
         """

@@ -19,9 +19,7 @@ GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
 PREDICTION_GENERATOR_ARGUMENTS_FILE_NAME = "generator_arguments.json"
 PREDICTION_FUNCTION = "pixels.generator.training.predict_function_batch"
 PREDICTION_CREATE_CATALOG_FUNCTION = "pixels.stac.build_catalog_from_items"
-PREDICTION_MERGE_RASTER_FUNCTION = (
-    "pixels.generator.prediction_utils.merge_prediction"
-)
+PREDICTION_MERGE_RASTER_FUNCTION = "pixels.generator.prediction_utils.merge_prediction"
 
 DATADOG_VIEWS = {
     "train": 51606,

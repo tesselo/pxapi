@@ -43,9 +43,7 @@ def rescale_to_channel_range(data, dfrom, dto, dover=None):
         # Divide data in upper and lower half.
         lower_half = data < 0.5
         # Recursive calls to scaling upper and lower half separately.
-        data[lower_half] = rescale_to_channel_range(
-            data[lower_half] * 2, dfrom, dover
-        )
+        data[lower_half] = rescale_to_channel_range(data[lower_half] * 2, dfrom, dover)
         data[numpy.logical_not(lower_half)] = rescale_to_channel_range(
             (data[numpy.logical_not(lower_half)] - 0.5) * 2, dover, dto
         )
@@ -110,9 +108,7 @@ def colorize(data, colormap):
 
         # Compute alpha channel from mask if available.
         if numpy.ma.is_masked(dat):
-            alpha = (
-                255 * numpy.logical_not(dat.mask) * (norm >= 0) * (norm <= 1)
-            )
+            alpha = 255 * numpy.logical_not(dat.mask) * (norm >= 0) * (norm <= 1)
         else:
             alpha = 255 * (norm > 0) * (norm < 1)
 

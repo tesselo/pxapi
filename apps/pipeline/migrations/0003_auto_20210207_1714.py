@@ -24,7 +24,9 @@ class Migration(migrations.Migration):
             model_name="kerasmodel",
             name="description",
             field=models.TextField(
-                blank=True, default="", help_text="Detailed description of the object."
+                blank=True,
+                default="",
+                help_text="Detailed description of the object.",
             ),
         ),
         migrations.AlterField(
@@ -38,7 +40,9 @@ class Migration(migrations.Migration):
             model_name="pixelsdata",
             name="description",
             field=models.TextField(
-                blank=True, default="", help_text="Detailed description of the object."
+                blank=True,
+                default="",
+                help_text="Detailed description of the object.",
             ),
         ),
         migrations.AlterField(
@@ -52,7 +56,9 @@ class Migration(migrations.Migration):
             model_name="trainingdata",
             name="description",
             field=models.TextField(
-                blank=True, default="", help_text="Detailed description of the object."
+                blank=True,
+                default="",
+                help_text="Detailed description of the object.",
             ),
         ),
         migrations.AlterField(
