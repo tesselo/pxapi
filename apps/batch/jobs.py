@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import boto3
 from django.conf import settings
@@ -33,6 +34,11 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
         the new job will only be executed if the dependencies were successful.
     """
     job_queue = "fetch-and-run-queue-gpu" if gpu else "fetch-and-run-queue"
+    job_definition = (
+        "production-run-job-definition"
+        if os.environ["ENVIRONMENT"] == "production"
+        else "first-run-job-definition"
+    )
     # Create job dict, inserting job name and command to execute. The retry
     # strategy ensures that jobs that are terminated due to spot instance
     # reclaims are automatically restarted up to five times.
@@ -43,7 +49,7 @@ def push(funk, *args, array_size=None, cpu=2, gpu=False, depends_on=None):
             datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         ),
         "jobQueue": job_queue,
-        "jobDefinition": "first-run-job-definition",
+        "jobDefinition": job_definition,
         "containerOverrides": {
             "command": ["runpixels.py", funk, *args],
         },
