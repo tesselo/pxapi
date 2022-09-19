@@ -140,7 +140,7 @@ pandas==1.4.4
     # via geopandas
 pg8000==1.29.1
     # via pixels
-pixels @ git+ssh://git@github.com/tesselo/pixels.git@57455f018f169cd3414948f92db3adf847f6d1ba
+pixels @ git+ssh://git@github.com/tesselo/pixels.git@00410569ef514a897a93c40a56ec232a7f78bf06
     # via -r requirements.in
 pkgutil-resolve-name==1.3.10
     # via jsonschema
