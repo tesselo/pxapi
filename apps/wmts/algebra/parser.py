@@ -3,7 +3,6 @@ import operator
 from functools import reduce
 
 import numpy
-from pixels.algebra import const
 from pyparsing import (
     Forward,
     Keyword,
@@ -16,6 +15,7 @@ from pyparsing import (
     delimitedList,
     oneOf,
 )
+from wmts.algebra import const
 
 
 class RasterAlgebraException(Exception):
