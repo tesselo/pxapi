@@ -4,8 +4,9 @@ import numpy
 import rasterio
 import sentry_sdk
 from django.http import HttpResponse
-from pixels import algebra, const
+from pixels import const
 from pixels.exceptions import PixelsException
+from wmts import algebra
 
 
 def rescale_to_channel_range(data, dfrom, dto, dover=None):
